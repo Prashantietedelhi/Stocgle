@@ -29307,7 +29307,7 @@ $(document).ready(function() {
     $.fn.dataTable.ext.search.push(
         function(settings, data, dataIndex) {
             var selectedRange = $('#marketCapFilter').val();
-            var marketCap = data[5].replace(/[^0-9.]/g, '');  // Assuming Total Market Cap is in the 6th column (index 5)
+            var marketCap = data[2].replace(/[^0-9.]/g, '');  // Assuming Total Market Cap is in the 6th column (index 5)
 
             if (marketCap === "" || isNaN(marketCap)) {
                 return false; // If invalid or missing data, skip
@@ -29337,8 +29337,8 @@ $(document).ready(function() {
             var financialEnd = $('#financialResultEnd').val();
             var volumeStart = $('#volumeChangeStart').val();
             var volumeEnd = $('#volumeChangeEnd').val();
-            var financialResultDate = data[6];  // Assuming Financial Result Date is the 7th column (index 6)
-            var suddenVolumeChangeDate = data[7];  // Assuming Sudden Volume Change Date is the 8th column (index 7)
+            var financialResultDate = data[1];  // Assuming Financial Result Date is the 7th column (index 6)
+            var suddenVolumeChangeDate = data[16];  // Assuming Sudden Volume Change Date is the 8th column (index 7)
 
             var priceMin = parseFloat($('#priceMin').val()) || -Infinity;
             var priceMax = parseFloat($('#priceMax').val()) || Infinity;
@@ -29347,9 +29347,9 @@ $(document).ready(function() {
             var currentProfitMin = parseFloat($('#currentProfitMin').val()) || -Infinity;
             var currentProfitMax = parseFloat($('#currentProfitMax').val()) || Infinity;
 
-            var currentStockPrice = parseFloat(data[1]) || 0;  // Assuming Current Stock Price is the 2nd column (index 1)
-            var todayProfit = parseFloat(data[2]) || 0;        // Assuming Today's Profit % is the 3rd column (index 2)
-            var currentProfit = parseFloat(data[3]) || 0;      // Assuming Current Profit from Period Start % is the 4th column (index 3)
+            var currentStockPrice = parseFloat(data[9]) || 0;  // Assuming Current Stock Price is the 2nd column (index 1)
+            var todayProfit = parseFloat(data[11]) || 0;        // Assuming Today's Profit % is the 3rd column (index 2)
+            var currentProfit = parseFloat(data[12]) || 0;      // Assuming Current Profit from Period Start % is the 4th column (index 3)
 
             // Filter by Financial Result Date
             if ((financialStart && financialResultDate < financialStart) || (financialEnd && financialResultDate > financialEnd)) {
