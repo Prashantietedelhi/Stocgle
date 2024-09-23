@@ -17,7 +17,7 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <style>
-  /* Container for the layout */
+/* Container for the layout */
 .container {
     display: grid;
     grid-template-columns: 1fr 3fr; /* Filters take 1/4 screen, table takes 3/4 */
@@ -76,7 +76,7 @@ tbody tr:hover {
     color: white;
     padding: 10px;
     border-radius: 5px;
-    margin: 10px 5px;
+    margin: 10px auto; /* Center the button by using auto for left and right margins */
     border: none;
     cursor: pointer;
     transition: background-color 0.3s ease;
@@ -114,12 +114,14 @@ button {
 
     .filter-section {
         margin-bottom: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center the buttons inside the filter-section */
     }
 
     /* Buttons should take up less space on smaller screens */
     .dt-button, .reset-button {
         width: 90%; /* Make buttons 90% of the parent container's width */
-        margin: 10px auto; /* Center the buttons horizontally */
         max-width: 300px; /* Restrict maximum width to prevent them from getting too large */
     }
 }
