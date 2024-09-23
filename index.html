@@ -17,24 +17,23 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <style>
-        /* Main container for the filters and table */
-        .main-container {
-            display: flex;
-            gap: 20px;
-        }
-
-        /* Sticky filter section */
-        .filter-section {
-            position: sticky;
-            top: 0;
-            align-self: flex-start;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: 250px;
-            z-index: 1000; /* Ensure filter section stays above the table */
-        }
+         .main-container {
+        display: flex;
+        flex-direction: row; /* Horizontal layout by default */
+        gap: 20px;
+        align-items: flex-start;
+    }
+        /* Filter section */
+    .filter-section {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        width: 250px; /* Fixed width for filters */
+        z-index: 1000; /* Ensures filter section stays above the table */
+        position: sticky;
+        top: 0;
+    }
 
         /* Add space between each filter */
         .filter-group {
@@ -48,16 +47,16 @@
             position: relative;
         }
 
-        /* Scrollable table container */
-        .table-section {
-            overflow-x: auto;
-            white-space: nowrap;
-            padding: 10px;
-            border-radius: 10px;
-            background-color: #fff;
-            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-            width: calc(100% - 250px); /* Full width minus the width of the filter section */
-        }
+         /* Table container */
+    .table-section {
+        overflow-x: auto;
+        white-space: nowrap;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: #fff;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        flex-grow: 1; /* Allows the table to grow and fill available space */
+    }
 
         /* Style the table */
         table {
@@ -152,27 +151,22 @@
             color: darkred;
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
-            }
-
-            .filter-section {
-                margin-bottom: 20px;
-            }
-
-            .dt-button, .reset-button {
-                width: 100%;
-                margin: 10px 0;
-                max-width: 300px;
-            }
-
-            .dataTables_wrapper .dataTables_filter input {
-                width: 100%;
-                max-width: none;
-            }
+        /* Responsive adjustments for smaller screens */
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column; /* Stack vertically on small screens */
+            gap: 10px;
         }
+
+        .filter-section {
+            width: 100%; /* Full width for filters */
+            padding: 15px;
+        }
+
+        .table-section {
+            width: 100%; /* Full width for the table */
+        }
+    }
     </style>
 </head>
 <body>
