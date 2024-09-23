@@ -17,201 +17,232 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <style>
+        /* Main container for the filters and table */
+        .main-container {
+            display: flex;
+            gap: 20px;
+        }
 
-/* Container for the layout */
-.container {
-    display: grid;
-    grid-template-columns: 1fr 3fr; /* Filters take 1/4 screen, table takes 3/4 */
-    gap: 20px;
-}
+        /* Sticky filter section */
+        .filter-section {
+            position: sticky;
+            top: 0;
+            align-self: flex-start;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: 250px;
+            z-index: 1000; /* Ensure filter section stays above the table */
+        }
 
-/* Style the filter section */
-.filter-section {
-    display: flex;
-    flex-direction: column;
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-}
+        /* Add space between each filter */
+        .filter-group {
+            margin-bottom: 20px;
+            position: relative; /* Allow positioning of filter dropdowns */
+        }
 
-/* Add space between each filter */
-.filter-group {
-    margin-bottom: 20px; /* Space between filters */
-}
+        /* Style the dropdown to prevent it from being hidden */
+        .filter-group select {
+            z-index: 1001; /* Ensure dropdown stays above table */
+            position: relative;
+        }
 
-/* Style the table */
-.table-section {
-    width: 100%;
-}
+        /* Scrollable table container */
+        .table-section {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            width: calc(100% - 250px); /* Full width minus the width of the filter section */
+        }
 
-/* Style the table */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white; /* Set the table background to white */
-}
+        /* Style the table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
 
-th, td {
-    padding: 15px;
-    border: 1px solid #ddd;
-    text-align: center;
-}
+        th, td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
 
-/* Header styling with simple gray border */
-th {
-    background-color: #f8f9fa;
-    color: #333;
-    border-bottom: 2px solid #ddd;
-}
+        /* Header styling */
+        th {
+            background-color: #f8f9fa;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            position: relative;
+            padding-left: 25px;
+        }
 
-/* Row hover effect */
-tbody tr:hover {
-    background-color: #f1f1f1;
-    cursor: pointer; /* Cursor pointer to make rows interactive */
-}
+        /* Row hover effect */
+        tbody tr:hover {
+            background-color: #f1f1f1;
+            cursor: pointer;
+        }
 
-/* Button styling */
-.dt-button {
-    background-color: #28a745;
-    color: white;
-    padding: 10px;
-    border-radius: 5px;
-    margin: 10px 0; /* Space between buttons */
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: auto; /* Adjust width to auto on larger screens */
-}
+        /* Button styling */
+        .dt-button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: auto;
+        }
 
-.dt-button:hover {
-    background-color: #218838;
-}
+        .dt-button:hover {
+            background-color: #218838;
+        }
 
-.reset-button {
-    background-color: #dc3545;
-}
+        .reset-button {
+            background-color: #dc3545;
+        }
 
-.reset-button:hover {
-    background-color: #c82333;
-}
+        .reset-button:hover {
+            background-color: #c82333;
+        }
 
-/* Ensure Search label is left-aligned */
-.dataTables_wrapper .dataTables_filter label {
-    text-align: left; /* Left-align the Search label */
-    display: block; /* Ensure it's treated as a block element for full width */
-    width: 100%; /* Full width to make alignment effective */
-    margin-bottom: 5px; /* Add some space below the label */
-}
+        /* Ensure Search label is left-aligned */
+        .dataTables_wrapper .dataTables_filter label {
+            text-align: left;
+            display: block;
+            width: 100%;
+            margin-bottom: 5px;
+        }
 
-/* Full width for search input */
-.dataTables_wrapper .dataTables_filter input {
-    width: 100%; /* Full width search input */
-    display: block; /* Ensure the input takes the full width */
-}
+        /* Limit width of search input */
+        .dataTables_wrapper .dataTables_filter input {
+            width: 100%;
+            max-width: 300px;
+            display: block;
+        }
 
-/* Always stack the search box and buttons vertically */
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dt-buttons {
-    display: flex;
-    flex-direction: column; /* Stack elements vertically */
-    align-items: flex-start; /* Align to the left */
-    margin-bottom: 10px;
-    width: 100%; /* Full width for buttons and search box */
-}
+        /* Always stack the search box and buttons vertically */
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dt-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            width: 100%;
+        }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .container {
-        grid-template-columns: 1fr; /* Filters and table stack vertically on smaller screens */
-    }
+        /* Cross (X) icon for column delete */
+        .delete-column-btn {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: red;
+            cursor: pointer;
+        }
 
-    .filter-section {
-        margin-bottom: 20px;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start; /* Align filters and buttons to the left */
-    }
+        .delete-column-btn:hover {
+            color: darkred;
+        }
 
-    /* Buttons and search box should take full width on smaller screens */
-    .dt-button, .reset-button {
-        width: 100%; /* Full width for buttons */
-        margin: 10px 0; /* Margin to add space */
-        max-width: 300px; /* Restrict maximum width */
-    }
-}
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
 
+            .filter-section {
+                margin-bottom: 20px;
+            }
+
+            .dt-button, .reset-button {
+                width: 100%;
+                margin: 10px 0;
+                max-width: 300px;
+            }
+
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100%;
+                max-width: none;
+            }
+        }
     </style>
 </head>
 <body>
 
 <h1>Stocgle Analytics Dashboard</h1>
 
-<!-- Container for filters and table -->
-<div class="container">
+<!-- Main container for filters and table -->
+<div class="main-container">
     <div class="filter-section">
         <h3>Filters</h3>
         <div id="filter-container"></div>
         <button id="add-filter" class="dt-button">Add Filter</button>
         <button id="apply-filter" class="dt-button">Apply Filters</button>
         <button id="reset-filters" class="dt-button reset-button">Reset Filters</button>
+        <button id="reset-columns" class="dt-button reset-button">Reset All Columns</button>
     </div>
     <div class="table-section">
         <table id="stock-table" class="display responsive nowrap">
             <thead>
                 <tr>
                     
-                        <th title="The name of the company.">Company</th>
+                        <th>Company <span class="delete-column-btn" data-column="0">&times;</span></th>
                     
-                        <th title="Date of Last Financial Result Published in the current quarter">Financial Result Date</th>
+                        <th>Financial Result Date <span class="delete-column-btn" data-column="1">&times;</span></th>
                     
-                        <th title="The total market capitalization of the company in Crores">Total Market Cap</th>
+                        <th>Total Market Cap <span class="delete-column-btn" data-column="2">&times;</span></th>
                     
-                        <th title="Net Profit Change in quarter">Net Profit Cr.</th>
+                        <th>Net Profit Cr. <span class="delete-column-btn" data-column="3">&times;</span></th>
                     
-                        <th title="% of change in net profit in this quarter commpare to previous quarter">Net Profit Change Quarter %</th>
+                        <th>Net Profit Change Quarter % <span class="delete-column-btn" data-column="4">&times;</span></th>
                     
-                        <th title="% of change in net profit in this quarter commpare to previous year">Net Profit Change Year %</th>
+                        <th>Net Profit Change Year % <span class="delete-column-btn" data-column="5">&times;</span></th>
                     
-                        <th title="% of Promoters Holding">Shareholding Promoters %</th>
+                        <th>Shareholding Promoters % <span class="delete-column-btn" data-column="6">&times;</span></th>
                     
-                        <th title="% of FII Shareholding">Shareholding FII %</th>
+                        <th>Shareholding FII % <span class="delete-column-btn" data-column="7">&times;</span></th>
                     
-                        <th title="% of DII Shareholding">Shareholding DII%</th>
+                        <th>Shareholding DII% <span class="delete-column-btn" data-column="8">&times;</span></th>
                     
-                        <th title="The latest stock price.">Current Stock Price</th>
+                        <th>Current Stock Price <span class="delete-column-btn" data-column="9">&times;</span></th>
                     
-                        <th title="Traded Volume">Traded Volume (Lakhs)</th>
+                        <th>Traded Volume (Lakhs) <span class="delete-column-btn" data-column="10">&times;</span></th>
                     
-                        <th title="PE ratio">pe</th>
+                        <th>pe <span class="delete-column-btn" data-column="11">&times;</span></th>
                     
-                        <th title="Divident share">divident</th>
+                        <th>divident <span class="delete-column-btn" data-column="12">&times;</span></th>
                     
-                        <th title="ROCE">roce</th>
+                        <th>roce <span class="delete-column-btn" data-column="13">&times;</span></th>
                     
-                        <th title="ROE">roe</th>
+                        <th>roe <span class="delete-column-btn" data-column="14">&times;</span></th>
                     
-                        <th title="The percentage change in stock price for today.">Todays Profit %</th>
+                        <th>Todays Profit % <span class="delete-column-btn" data-column="15">&times;</span></th>
                     
-                        <th title="The total profit percentage from the Financial Result date to now.">Current Profit from Period Start Date %</th>
+                        <th>Current Profit from Period Start Date % <span class="delete-column-btn" data-column="16">&times;</span></th>
                     
-                        <th title="The probability of stock performance in the future.">Probability</th>
+                        <th>Probability <span class="delete-column-btn" data-column="17">&times;</span></th>
                     
-                        <th title="Profit on Financial Result Day">Profit on Financial Result Day</th>
+                        <th>Profit on Financial Result Day <span class="delete-column-btn" data-column="18">&times;</span></th>
                     
-                        <th title="Price movement per day after the financial result published">Momentum /Valatility</th>
+                        <th>Momentum /Valatility <span class="delete-column-btn" data-column="19">&times;</span></th>
                     
-                        <th title="Sudden Volume">Volume</th>
+                        <th>Volume <span class="delete-column-btn" data-column="20">&times;</span></th>
                     
-                        <th title="Sudden Volume change Date">Sudden Volume Change Date</th>
+                        <th>Sudden Volume Change Date <span class="delete-column-btn" data-column="21">&times;</span></th>
                     
-                        <th title="% of Sudden Volume Changed">vol_pct_change</th>
+                        <th>vol_pct_change <span class="delete-column-btn" data-column="22">&times;</span></th>
                     
-                        <th title="Z Score of Volume Change">z_score</th>
+                        <th>z_score <span class="delete-column-btn" data-column="23">&times;</span></th>
                     
-                        <th title="Price movement of stock on Sudden Volume Change Date">Profit Day Rs</th>
-                    
-                        <th title="">Number of time Volume Signifincat Change Quarter</th>
+                        <th>Profit Day Rs <span class="delete-column-btn" data-column="24">&times;</span></th>
                     
                 </tr>
             </thead>
@@ -269,8 +300,6 @@ tbody tr:hover {
                     
                     <td>4.34</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -325,8 +354,6 @@ tbody tr:hover {
                     
                     <td>20.60</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -370,8 +397,6 @@ tbody tr:hover {
                     <td>15.0</td>
                     
                     <td>0.25</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -437,8 +462,6 @@ tbody tr:hover {
                     
                     <td>0.79</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -492,8 +515,6 @@ tbody tr:hover {
                     <td>2.93</td>
                     
                     <td>3.92</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -549,8 +570,6 @@ tbody tr:hover {
                     
                     <td>0.61</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -604,8 +623,6 @@ tbody tr:hover {
                     <td>2.96</td>
                     
                     <td>0.67</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -661,8 +678,6 @@ tbody tr:hover {
                     
                     <td>7.68</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -717,8 +732,6 @@ tbody tr:hover {
                     
                     <td>4.38</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -762,8 +775,6 @@ tbody tr:hover {
                     <td>4.032785384</td>
                     
                     <td>0.19</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -829,8 +840,6 @@ tbody tr:hover {
                     
                     <td>8.34</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -884,8 +893,6 @@ tbody tr:hover {
                     <td>2.48</td>
                     
                     <td>4.29</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -941,8 +948,6 @@ tbody tr:hover {
                     
                     <td>4.95</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -996,8 +1001,6 @@ tbody tr:hover {
                     <td>5.07</td>
                     
                     <td>8.97</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -1053,8 +1056,6 @@ tbody tr:hover {
                     
                     <td>19.09</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1108,8 +1109,6 @@ tbody tr:hover {
                     <td>2.80</td>
                     
                     <td>12.07</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -1165,8 +1164,6 @@ tbody tr:hover {
                     
                     <td>1.31</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1220,8 +1217,6 @@ tbody tr:hover {
                     <td>3.32</td>
                     
                     <td>8.25</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -1277,8 +1272,6 @@ tbody tr:hover {
                     
                     <td>19.95</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1322,8 +1315,6 @@ tbody tr:hover {
                     <td>-2.492858887</td>
                     
                     <td>0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -1389,8 +1380,6 @@ tbody tr:hover {
                     
                     <td>4.24</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1444,8 +1433,6 @@ tbody tr:hover {
                     <td>5.06</td>
                     
                     <td>10.62</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -1501,8 +1488,6 @@ tbody tr:hover {
                     
                     <td>6.52</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1556,8 +1541,6 @@ tbody tr:hover {
                     <td>3.16</td>
                     
                     <td>3.28</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -1613,8 +1596,6 @@ tbody tr:hover {
                     
                     <td>6.37</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1669,8 +1650,6 @@ tbody tr:hover {
                     
                     <td>1.81</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1714,8 +1693,6 @@ tbody tr:hover {
                     <td>-3.64298725</td>
                     
                     <td>0.18</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -1781,8 +1758,6 @@ tbody tr:hover {
                     
                     <td>5.30</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1826,8 +1801,6 @@ tbody tr:hover {
                     <td>4.832607308</td>
                     
                     <td>0.19</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -1893,8 +1866,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1949,8 +1920,6 @@ tbody tr:hover {
                     
                     <td>1.01</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -1994,8 +1963,6 @@ tbody tr:hover {
                     <td>9.349865952</td>
                     
                     <td>0.20</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -2061,8 +2028,6 @@ tbody tr:hover {
                     
                     <td>7.98</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2106,8 +2071,6 @@ tbody tr:hover {
                     <td>4.015905544</td>
                     
                     <td>1.53</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -2173,8 +2136,6 @@ tbody tr:hover {
                     
                     <td>3.39</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2228,8 +2189,6 @@ tbody tr:hover {
                     <td>3.18</td>
                     
                     <td>1.09</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -2285,8 +2244,6 @@ tbody tr:hover {
                     
                     <td>2.59</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2340,8 +2297,6 @@ tbody tr:hover {
                     <td>2.34</td>
                     
                     <td>2.81</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -2397,8 +2352,6 @@ tbody tr:hover {
                     
                     <td>6.04</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2442,8 +2395,6 @@ tbody tr:hover {
                     <td>-2.608817513</td>
                     
                     <td>0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -2509,8 +2460,6 @@ tbody tr:hover {
                     
                     <td>2.81</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2564,8 +2513,6 @@ tbody tr:hover {
                     <td>2.68</td>
                     
                     <td>2.91</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -2621,8 +2568,6 @@ tbody tr:hover {
                     
                     <td>4.73</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2666,8 +2611,6 @@ tbody tr:hover {
                     <td>2.051845932</td>
                     
                     <td>0.12</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -2733,8 +2676,6 @@ tbody tr:hover {
                     
                     <td>7.20</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2778,8 +2719,6 @@ tbody tr:hover {
                     <td>2.712626192</td>
                     
                     <td>0.18</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -2845,8 +2784,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -2900,8 +2837,6 @@ tbody tr:hover {
                     <td>4.27</td>
                     
                     <td>1.30</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -2957,8 +2892,6 @@ tbody tr:hover {
                     
                     <td>3.27</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3012,8 +2945,6 @@ tbody tr:hover {
                     <td>3.55</td>
                     
                     <td>8.29</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -3069,8 +3000,6 @@ tbody tr:hover {
                     
                     <td>5.75</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3125,8 +3054,6 @@ tbody tr:hover {
                     
                     <td>12.97</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3170,8 +3097,6 @@ tbody tr:hover {
                     <td>9.042140492</td>
                     
                     <td>1.62</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -3237,8 +3162,6 @@ tbody tr:hover {
                     
                     <td>18.28</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3292,8 +3215,6 @@ tbody tr:hover {
                     <td>2.83</td>
                     
                     <td>13.43</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -3349,8 +3270,6 @@ tbody tr:hover {
                     
                     <td>2.91</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3394,8 +3313,6 @@ tbody tr:hover {
                     <td>5.404729447</td>
                     
                     <td>0.14</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -3461,8 +3378,6 @@ tbody tr:hover {
                     
                     <td>0.84</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3516,8 +3431,6 @@ tbody tr:hover {
                     <td>2.12</td>
                     
                     <td>2.72</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -3573,8 +3486,6 @@ tbody tr:hover {
                     
                     <td>11.92</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3628,8 +3539,6 @@ tbody tr:hover {
                     <td>4.49</td>
                     
                     <td>1.88</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -3685,8 +3594,6 @@ tbody tr:hover {
                     
                     <td>4.46</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3730,8 +3637,6 @@ tbody tr:hover {
                     <td>0.246275097</td>
                     
                     <td>0.13</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -3797,8 +3702,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3842,8 +3745,6 @@ tbody tr:hover {
                     <td>9.61666531</td>
                     
                     <td>0.14</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -3909,8 +3810,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -3964,8 +3863,6 @@ tbody tr:hover {
                     <td>5.70</td>
                     
                     <td>5.61</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -4021,8 +3918,6 @@ tbody tr:hover {
                     
                     <td>2.81</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4077,8 +3972,6 @@ tbody tr:hover {
                     
                     <td>1.86</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4122,8 +4015,6 @@ tbody tr:hover {
                     <td>0.022949219</td>
                     
                     <td>0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -4189,8 +4080,6 @@ tbody tr:hover {
                     
                     <td>8.25</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4244,8 +4133,6 @@ tbody tr:hover {
                     <td>3.69</td>
                     
                     <td>8.58</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -4301,8 +4188,6 @@ tbody tr:hover {
                     
                     <td>15.34</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4357,8 +4242,6 @@ tbody tr:hover {
                     
                     <td>14.48</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4402,8 +4285,6 @@ tbody tr:hover {
                     <td>0.745321261</td>
                     
                     <td>0.91</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -4469,8 +4350,6 @@ tbody tr:hover {
                     
                     <td>12.82</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4524,8 +4403,6 @@ tbody tr:hover {
                     <td>3.15</td>
                     
                     <td>6.79</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -4581,8 +4458,6 @@ tbody tr:hover {
                     
                     <td>0.38</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4637,8 +4512,6 @@ tbody tr:hover {
                     
                     <td>0.60</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4682,8 +4555,6 @@ tbody tr:hover {
                     <td>4.032971291</td>
                     
                     <td>0.14</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -4749,8 +4620,6 @@ tbody tr:hover {
                     
                     <td>11.73</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4794,8 +4663,6 @@ tbody tr:hover {
                     <td>1.137588346</td>
                     
                     <td>0.12</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -4861,8 +4728,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -4916,8 +4781,6 @@ tbody tr:hover {
                     <td>3.30</td>
                     
                     <td>2.04</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -4973,8 +4836,6 @@ tbody tr:hover {
                     
                     <td>10.62</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5028,8 +4889,6 @@ tbody tr:hover {
                     <td>2.61</td>
                     
                     <td>2.66</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -5085,8 +4944,6 @@ tbody tr:hover {
                     
                     <td>4.48</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5141,8 +4998,6 @@ tbody tr:hover {
                     
                     <td>1.12</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5186,8 +5041,6 @@ tbody tr:hover {
                     <td>6.48888708</td>
                     
                     <td>0.13</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -5253,8 +5106,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5308,8 +5159,6 @@ tbody tr:hover {
                     <td>5.74</td>
                     
                     <td>0.92</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -5365,8 +5214,6 @@ tbody tr:hover {
                     
                     <td>19.54</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5410,8 +5257,6 @@ tbody tr:hover {
                     <td>7.094186045</td>
                     
                     <td>0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -5477,8 +5322,6 @@ tbody tr:hover {
                     
                     <td>4.83</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5533,8 +5376,6 @@ tbody tr:hover {
                     
                     <td>3.45</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5578,8 +5419,6 @@ tbody tr:hover {
                     <td>-2.184215345</td>
                     
                     <td>0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -5645,8 +5484,6 @@ tbody tr:hover {
                     
                     <td>16.37</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5700,8 +5537,6 @@ tbody tr:hover {
                     <td>2.90</td>
                     
                     <td>14.46</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -5757,8 +5592,6 @@ tbody tr:hover {
                     
                     <td>6.54</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5802,8 +5635,6 @@ tbody tr:hover {
                     <td>26.65632939</td>
                     
                     <td>0.96</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -5869,8 +5700,6 @@ tbody tr:hover {
                     
                     <td>7.49</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5925,8 +5754,6 @@ tbody tr:hover {
                     
                     <td>0.66</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -5970,8 +5797,6 @@ tbody tr:hover {
                     <td>2.157373383</td>
                     
                     <td>1.16</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6037,8 +5862,6 @@ tbody tr:hover {
                     
                     <td>8.99</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6082,8 +5905,6 @@ tbody tr:hover {
                     <td>11.08672044</td>
                     
                     <td>0.73</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6149,8 +5970,6 @@ tbody tr:hover {
                     
                     <td>12.20</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6194,8 +6013,6 @@ tbody tr:hover {
                     <td>-4.009719521</td>
                     
                     <td>0.91</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6261,8 +6078,6 @@ tbody tr:hover {
                     
                     <td>6.01</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6316,8 +6131,6 @@ tbody tr:hover {
                     <td>3.30</td>
                     
                     <td>1.22</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -6373,8 +6186,6 @@ tbody tr:hover {
                     
                     <td>11.55</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6428,8 +6239,6 @@ tbody tr:hover {
                     <td>3.26</td>
                     
                     <td>9.43</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -6485,8 +6294,6 @@ tbody tr:hover {
                     
                     <td>3.84</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6530,8 +6337,6 @@ tbody tr:hover {
                     <td>-4.021844541</td>
                     
                     <td>1.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6597,8 +6402,6 @@ tbody tr:hover {
                     
                     <td>1.55</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6652,8 +6455,6 @@ tbody tr:hover {
                     <td>4.50</td>
                     
                     <td>6.79</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -6709,8 +6510,6 @@ tbody tr:hover {
                     
                     <td>1.53</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6754,8 +6553,6 @@ tbody tr:hover {
                     <td>-0.761458816</td>
                     
                     <td>0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6821,8 +6618,6 @@ tbody tr:hover {
                     
                     <td>8.21</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6866,8 +6661,6 @@ tbody tr:hover {
                     <td>-3.476318359</td>
                     
                     <td>0.12</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -6933,8 +6726,6 @@ tbody tr:hover {
                     
                     <td>14.09</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -6988,8 +6779,6 @@ tbody tr:hover {
                     <td>3.66</td>
                     
                     <td>2.28</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -7045,8 +6834,6 @@ tbody tr:hover {
                     
                     <td>1.63</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7090,8 +6877,6 @@ tbody tr:hover {
                     <td>-0.471438209</td>
                     
                     <td>0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -7157,8 +6942,6 @@ tbody tr:hover {
                     
                     <td>2.38</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7212,8 +6995,6 @@ tbody tr:hover {
                     <td>2.13</td>
                     
                     <td>5.96</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -7269,8 +7050,6 @@ tbody tr:hover {
                     
                     <td>5.95</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7314,8 +7093,6 @@ tbody tr:hover {
                     <td>8.581131996</td>
                     
                     <td>0.06</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -7381,8 +7158,6 @@ tbody tr:hover {
                     
                     <td>8.64</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7436,8 +7211,6 @@ tbody tr:hover {
                     <td>2.29</td>
                     
                     <td>10.13</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -7493,8 +7266,6 @@ tbody tr:hover {
                     
                     <td>0.56</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7548,8 +7319,6 @@ tbody tr:hover {
                     <td>2.12</td>
                     
                     <td>6.23</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -7605,8 +7374,6 @@ tbody tr:hover {
                     
                     <td>18.09</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7660,8 +7427,6 @@ tbody tr:hover {
                     <td>4.13</td>
                     
                     <td>15.17</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -7717,8 +7482,6 @@ tbody tr:hover {
                     
                     <td>6.52</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7772,8 +7535,6 @@ tbody tr:hover {
                     <td>3.36</td>
                     
                     <td>10.64</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -7829,8 +7590,6 @@ tbody tr:hover {
                     
                     <td>2.62</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7885,8 +7644,6 @@ tbody tr:hover {
                     
                     <td>2.62</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -7930,8 +7687,6 @@ tbody tr:hover {
                     <td>24.5858449</td>
                     
                     <td>0.68</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -7997,8 +7752,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8052,8 +7805,6 @@ tbody tr:hover {
                     <td>2.12</td>
                     
                     <td>5.50</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -8109,8 +7860,6 @@ tbody tr:hover {
                     
                     <td>4.62</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8165,8 +7914,6 @@ tbody tr:hover {
                     
                     <td>0.46</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8210,8 +7957,6 @@ tbody tr:hover {
                     <td>2.103833072</td>
                     
                     <td>0.87</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -8277,8 +8022,6 @@ tbody tr:hover {
                     
                     <td>1.41</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8332,8 +8075,6 @@ tbody tr:hover {
                     <td>2.97</td>
                     
                     <td>0.46</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -8389,8 +8130,6 @@ tbody tr:hover {
                     
                     <td>6.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8434,8 +8173,6 @@ tbody tr:hover {
                     <td>11.21086654</td>
                     
                     <td>0.85</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -8501,8 +8238,6 @@ tbody tr:hover {
                     
                     <td>2.49</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8556,8 +8291,6 @@ tbody tr:hover {
                     <td>4.99</td>
                     
                     <td>4.54</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -8613,8 +8346,6 @@ tbody tr:hover {
                     
                     <td>0.24</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8658,8 +8389,6 @@ tbody tr:hover {
                     <td>3.990450506</td>
                     
                     <td>0.83</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -8725,8 +8454,6 @@ tbody tr:hover {
                     
                     <td>4.05</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8781,8 +8508,6 @@ tbody tr:hover {
                     
                     <td>17.07</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8826,8 +8551,6 @@ tbody tr:hover {
                     <td>4.961268805</td>
                     
                     <td>0.73</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -8893,8 +8616,6 @@ tbody tr:hover {
                     
                     <td>5.21</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -8948,8 +8669,6 @@ tbody tr:hover {
                     <td>2.52</td>
                     
                     <td>5.26</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -9005,8 +8724,6 @@ tbody tr:hover {
                     
                     <td>10.30</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9060,8 +8777,6 @@ tbody tr:hover {
                     <td>3.18</td>
                     
                     <td>2.25</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -9117,8 +8832,6 @@ tbody tr:hover {
                     
                     <td>16.18</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9172,8 +8885,6 @@ tbody tr:hover {
                     <td>2.22</td>
                     
                     <td>3.51</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -9229,8 +8940,6 @@ tbody tr:hover {
                     
                     <td>5.64</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9274,8 +8983,6 @@ tbody tr:hover {
                     <td>3.369398771</td>
                     
                     <td>0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -9341,8 +9048,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9396,8 +9101,6 @@ tbody tr:hover {
                     <td>2.19</td>
                     
                     <td>9.37</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -9453,8 +9156,6 @@ tbody tr:hover {
                     
                     <td>2.01</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9508,8 +9209,6 @@ tbody tr:hover {
                     <td>3.59</td>
                     
                     <td>4.50</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -9565,8 +9264,6 @@ tbody tr:hover {
                     
                     <td>10.18</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9620,8 +9317,6 @@ tbody tr:hover {
                     <td>2.77</td>
                     
                     <td>4.41</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -9677,8 +9372,6 @@ tbody tr:hover {
                     
                     <td>2.69</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9722,8 +9415,6 @@ tbody tr:hover {
                     <td>-0.20378806</td>
                     
                     <td>0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -9789,8 +9480,6 @@ tbody tr:hover {
                     
                     <td>4.92</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9845,8 +9534,6 @@ tbody tr:hover {
                     
                     <td>2.85</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -9890,8 +9577,6 @@ tbody tr:hover {
                     <td>5.980642011</td>
                     
                     <td>0.08</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -9957,8 +9642,6 @@ tbody tr:hover {
                     
                     <td>0.02</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10002,8 +9685,6 @@ tbody tr:hover {
                     <td>-11.72063337</td>
                     
                     <td>0.08</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -10069,8 +9750,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10124,8 +9803,6 @@ tbody tr:hover {
                     <td>2.43</td>
                     
                     <td>3.57</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -10181,8 +9858,6 @@ tbody tr:hover {
                     
                     <td>2.70</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10236,8 +9911,6 @@ tbody tr:hover {
                     <td>5.82</td>
                     
                     <td>3.31</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -10293,8 +9966,6 @@ tbody tr:hover {
                     
                     <td>7.57</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10348,8 +10019,6 @@ tbody tr:hover {
                     <td>2.72</td>
                     
                     <td>1.98</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -10405,8 +10074,6 @@ tbody tr:hover {
                     
                     <td>1.35</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10461,8 +10128,6 @@ tbody tr:hover {
                     
                     <td>2.47</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10506,8 +10171,6 @@ tbody tr:hover {
                     <td>4.973814028</td>
                     
                     <td>0.07</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -10573,8 +10236,6 @@ tbody tr:hover {
                     
                     <td>3.71</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10628,8 +10289,6 @@ tbody tr:hover {
                     <td>3.47</td>
                     
                     <td>1.37</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -10685,8 +10344,6 @@ tbody tr:hover {
                     
                     <td>6.13</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10740,8 +10397,6 @@ tbody tr:hover {
                     <td>4.38</td>
                     
                     <td>9.00</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -10797,8 +10452,6 @@ tbody tr:hover {
                     
                     <td>1.68</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10853,8 +10506,6 @@ tbody tr:hover {
                     
                     <td>2.78</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -10898,8 +10549,6 @@ tbody tr:hover {
                     <td>13.99253731</td>
                     
                     <td>0.71</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -10965,8 +10614,6 @@ tbody tr:hover {
                     
                     <td>5.56</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11020,8 +10667,6 @@ tbody tr:hover {
                     <td>2.57</td>
                     
                     <td>1.17</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -11077,8 +10722,6 @@ tbody tr:hover {
                     
                     <td>2.60</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11132,8 +10775,6 @@ tbody tr:hover {
                     <td>2.40</td>
                     
                     <td>7.89</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -11189,8 +10830,6 @@ tbody tr:hover {
                     
                     <td>18.23</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11245,8 +10884,6 @@ tbody tr:hover {
                     
                     <td>7.54</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11290,8 +10927,6 @@ tbody tr:hover {
                     <td>9.703221475</td>
                     
                     <td>0.64</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -11357,8 +10992,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11402,8 +11035,6 @@ tbody tr:hover {
                     <td>4.190140845</td>
                     
                     <td>0.48</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -11469,8 +11100,6 @@ tbody tr:hover {
                     
                     <td>8.43</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11524,8 +11153,6 @@ tbody tr:hover {
                     <td>3.79</td>
                     
                     <td>14.18</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -11581,8 +11208,6 @@ tbody tr:hover {
                     
                     <td>9.60</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11636,8 +11261,6 @@ tbody tr:hover {
                     <td>4.05</td>
                     
                     <td>4.57</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -11693,8 +11316,6 @@ tbody tr:hover {
                     
                     <td>9.35</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11738,8 +11359,6 @@ tbody tr:hover {
                     <td>-5.248489335</td>
                     
                     <td>0.42</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -11805,8 +11424,6 @@ tbody tr:hover {
                     
                     <td>3.78</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11860,8 +11477,6 @@ tbody tr:hover {
                     <td>4.09</td>
                     
                     <td>4.60</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -11917,8 +11532,6 @@ tbody tr:hover {
                     
                     <td>10.92</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -11972,8 +11585,6 @@ tbody tr:hover {
                     <td>3.95</td>
                     
                     <td>13.12</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -12029,8 +11640,6 @@ tbody tr:hover {
                     
                     <td>5.69</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12084,8 +11693,6 @@ tbody tr:hover {
                     <td>4.35</td>
                     
                     <td>8.09</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -12141,8 +11748,6 @@ tbody tr:hover {
                     
                     <td>5.85</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12197,8 +11802,6 @@ tbody tr:hover {
                     
                     <td>1.80</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12242,8 +11845,6 @@ tbody tr:hover {
                     <td>3.805820502</td>
                     
                     <td>0.43</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -12309,8 +11910,6 @@ tbody tr:hover {
                     
                     <td>7.32</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12365,8 +11964,6 @@ tbody tr:hover {
                     
                     <td>2.92</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12410,8 +12007,6 @@ tbody tr:hover {
                     <td>22.60000212</td>
                     
                     <td>0.47</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -12477,8 +12072,6 @@ tbody tr:hover {
                     
                     <td>8.95</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12532,8 +12125,6 @@ tbody tr:hover {
                     <td>2.88</td>
                     
                     <td>3.53</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -12589,8 +12180,6 @@ tbody tr:hover {
                     
                     <td>9.99</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12644,8 +12233,6 @@ tbody tr:hover {
                     <td>3.48</td>
                     
                     <td>5.51</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -12701,8 +12288,6 @@ tbody tr:hover {
                     
                     <td>16.95</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12756,8 +12341,6 @@ tbody tr:hover {
                     <td>2.91</td>
                     
                     <td>3.78</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -12813,8 +12396,6 @@ tbody tr:hover {
                     
                     <td>2.46</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12868,8 +12449,6 @@ tbody tr:hover {
                     <td>2.62</td>
                     
                     <td>7.48</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -12925,8 +12504,6 @@ tbody tr:hover {
                     
                     <td>6.79</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -12970,8 +12547,6 @@ tbody tr:hover {
                     <td>10.1656329</td>
                     
                     <td>0.34</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -13037,8 +12612,6 @@ tbody tr:hover {
                     
                     <td>6.01</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13092,8 +12665,6 @@ tbody tr:hover {
                     <td>2.30</td>
                     
                     <td>7.66</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -13149,8 +12720,6 @@ tbody tr:hover {
                     
                     <td>10.14</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13204,8 +12773,6 @@ tbody tr:hover {
                     <td>2.20</td>
                     
                     <td>2.97</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -13261,8 +12828,6 @@ tbody tr:hover {
                     
                     <td>8.10</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13306,8 +12871,6 @@ tbody tr:hover {
                     <td>7.579345467</td>
                     
                     <td>0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -13373,8 +12936,6 @@ tbody tr:hover {
                     
                     <td>12.11</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13428,8 +12989,6 @@ tbody tr:hover {
                     <td>2.66</td>
                     
                     <td>0.72</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -13485,8 +13044,6 @@ tbody tr:hover {
                     
                     <td>2.09</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13530,8 +13087,6 @@ tbody tr:hover {
                     <td>-1.656726292</td>
                     
                     <td>0.07</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -13597,8 +13152,6 @@ tbody tr:hover {
                     
                     <td>2.21</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13652,8 +13205,6 @@ tbody tr:hover {
                     <td>2.52</td>
                     
                     <td>2.63</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -13709,8 +13260,6 @@ tbody tr:hover {
                     
                     <td>5.13</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13754,8 +13303,6 @@ tbody tr:hover {
                     <td>10.68221617</td>
                     
                     <td>0.04</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -13821,8 +13368,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13876,8 +13421,6 @@ tbody tr:hover {
                     <td>3.19</td>
                     
                     <td>2.61</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -13933,8 +13476,6 @@ tbody tr:hover {
                     
                     <td>4.75</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -13988,8 +13529,6 @@ tbody tr:hover {
                     <td>4.21</td>
                     
                     <td>8.00</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -14045,8 +13584,6 @@ tbody tr:hover {
                     
                     <td>1.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14090,8 +13627,6 @@ tbody tr:hover {
                     <td>5.59566787</td>
                     
                     <td>0.03</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -14157,8 +13692,6 @@ tbody tr:hover {
                     
                     <td>6.06</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14212,8 +13745,6 @@ tbody tr:hover {
                     <td>2.96</td>
                     
                     <td>1.65</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -14269,8 +13800,6 @@ tbody tr:hover {
                     
                     <td>2.12</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14324,8 +13853,6 @@ tbody tr:hover {
                     <td>3.69</td>
                     
                     <td>15.11</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -14381,8 +13908,6 @@ tbody tr:hover {
                     
                     <td>0.00</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14426,8 +13951,6 @@ tbody tr:hover {
                     <td>19.36728395</td>
                     
                     <td>0.32</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -14493,8 +14016,6 @@ tbody tr:hover {
                     
                     <td>10.45</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14549,8 +14070,6 @@ tbody tr:hover {
                     
                     <td>8.57</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14594,8 +14113,6 @@ tbody tr:hover {
                     <td>-0.02923813</td>
                     
                     <td>0.46</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -14661,8 +14178,6 @@ tbody tr:hover {
                     
                     <td>1.44</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14716,8 +14231,6 @@ tbody tr:hover {
                     <td>2.59</td>
                     
                     <td>2.44</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -14773,8 +14286,6 @@ tbody tr:hover {
                     
                     <td>4.18</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14818,8 +14329,6 @@ tbody tr:hover {
                     <td>4.022053759</td>
                     
                     <td>0.48</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -14885,8 +14394,6 @@ tbody tr:hover {
                     
                     <td>4.61</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -14940,8 +14447,6 @@ tbody tr:hover {
                     <td>2.79</td>
                     
                     <td>10.15</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -14997,8 +14502,6 @@ tbody tr:hover {
                     
                     <td>1.34</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15042,8 +14545,6 @@ tbody tr:hover {
                     <td>10.94805565</td>
                     
                     <td>0.35</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -15109,8 +14610,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15164,8 +14663,6 @@ tbody tr:hover {
                     <td>4.72</td>
                     
                     <td>8.52</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -15221,8 +14718,6 @@ tbody tr:hover {
                     
                     <td>2.33</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15266,8 +14761,6 @@ tbody tr:hover {
                     <td>13.87563414</td>
                     
                     <td>0.45</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -15333,8 +14826,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15388,8 +14879,6 @@ tbody tr:hover {
                     <td>5.02</td>
                     
                     <td>7.36</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -15445,8 +14934,6 @@ tbody tr:hover {
                     
                     <td>8.17</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15500,8 +14987,6 @@ tbody tr:hover {
                     <td>2.41</td>
                     
                     <td>1.73</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -15557,8 +15042,6 @@ tbody tr:hover {
                     
                     <td>11.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15612,8 +15095,6 @@ tbody tr:hover {
                     <td>2.28</td>
                     
                     <td>5.78</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -15669,8 +15150,6 @@ tbody tr:hover {
                     
                     <td>7.84</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15714,8 +15193,6 @@ tbody tr:hover {
                     <td>-3.924840651</td>
                     
                     <td>0.40</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -15781,8 +15258,6 @@ tbody tr:hover {
                     
                     <td>1.64</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15826,8 +15301,6 @@ tbody tr:hover {
                     <td>15.52103283</td>
                     
                     <td>0.35</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -15893,8 +15366,6 @@ tbody tr:hover {
                     
                     <td>1.73</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -15948,8 +15419,6 @@ tbody tr:hover {
                     <td>3.87</td>
                     
                     <td>1.69</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -16005,8 +15474,6 @@ tbody tr:hover {
                     
                     <td>1.12</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16060,8 +15527,6 @@ tbody tr:hover {
                     <td>2.01</td>
                     
                     <td>2.78</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -16117,8 +15582,6 @@ tbody tr:hover {
                     
                     <td>7.15</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16172,8 +15635,6 @@ tbody tr:hover {
                     <td>3.06</td>
                     
                     <td>5.65</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -16229,8 +15690,6 @@ tbody tr:hover {
                     
                     <td>20.00</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16284,8 +15743,6 @@ tbody tr:hover {
                     <td>2.26</td>
                     
                     <td>2.44</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -16341,8 +15798,6 @@ tbody tr:hover {
                     
                     <td>2.78</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16386,8 +15841,6 @@ tbody tr:hover {
                     <td>38.61228814</td>
                     
                     <td>0.34</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -16453,8 +15906,6 @@ tbody tr:hover {
                     
                     <td>9.82</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16498,8 +15949,6 @@ tbody tr:hover {
                     <td>3.95844226</td>
                     
                     <td>3.72</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -16565,8 +16014,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16620,8 +16067,6 @@ tbody tr:hover {
                     <td>4.02</td>
                     
                     <td>6.32</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -16677,8 +16122,6 @@ tbody tr:hover {
                     
                     <td>4.40</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16732,8 +16175,6 @@ tbody tr:hover {
                     <td>3.83</td>
                     
                     <td>4.57</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -16789,8 +16230,6 @@ tbody tr:hover {
                     
                     <td>1.27</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16844,8 +16283,6 @@ tbody tr:hover {
                     <td>3.63</td>
                     
                     <td>3.07</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -16901,8 +16338,6 @@ tbody tr:hover {
                     
                     <td>0.26</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -16946,8 +16381,6 @@ tbody tr:hover {
                     <td>6.245562398</td>
                     
                     <td>0.27</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17013,8 +16446,6 @@ tbody tr:hover {
                     
                     <td>3.26</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17058,8 +16489,6 @@ tbody tr:hover {
                     <td>-4.147661726</td>
                     
                     <td>0.34</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17125,8 +16554,6 @@ tbody tr:hover {
                     
                     <td>5.37</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17180,8 +16607,6 @@ tbody tr:hover {
                     <td>4.84</td>
                     
                     <td>6.59</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -17237,8 +16662,6 @@ tbody tr:hover {
                     
                     <td>6.10</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17282,8 +16705,6 @@ tbody tr:hover {
                     <td>9.986783334</td>
                     
                     <td>0.33</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17349,8 +16770,6 @@ tbody tr:hover {
                     
                     <td>4.15</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17405,8 +16824,6 @@ tbody tr:hover {
                     
                     <td>19.47</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17450,8 +16867,6 @@ tbody tr:hover {
                     <td>-4.929906542</td>
                     
                     <td>0.33</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17517,8 +16932,6 @@ tbody tr:hover {
                     
                     <td>4.86</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17562,8 +16975,6 @@ tbody tr:hover {
                     <td>4.837002484</td>
                     
                     <td>0.29</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17629,8 +17040,6 @@ tbody tr:hover {
                     
                     <td>3.26</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17684,8 +17093,6 @@ tbody tr:hover {
                     <td>5.19</td>
                     
                     <td>19.59</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -17741,8 +17148,6 @@ tbody tr:hover {
                     
                     <td>15.56</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17796,8 +17201,6 @@ tbody tr:hover {
                     <td>3.30</td>
                     
                     <td>3.50</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -17853,8 +17256,6 @@ tbody tr:hover {
                     
                     <td>1.19</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -17898,8 +17299,6 @@ tbody tr:hover {
                     <td>12.37377561</td>
                     
                     <td>0.28</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -17965,8 +17364,6 @@ tbody tr:hover {
                     
                     <td>4.19</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18020,8 +17417,6 @@ tbody tr:hover {
                     <td>3.37</td>
                     
                     <td>7.19</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -18077,8 +17472,6 @@ tbody tr:hover {
                     
                     <td>4.76</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18132,8 +17525,6 @@ tbody tr:hover {
                     <td>4.95</td>
                     
                     <td>5.69</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -18189,8 +17580,6 @@ tbody tr:hover {
                     
                     <td>5.66</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18245,8 +17634,6 @@ tbody tr:hover {
                     
                     <td>5.19</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18290,8 +17677,6 @@ tbody tr:hover {
                     <td>13.35608243</td>
                     
                     <td>0.22</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -18357,8 +17742,6 @@ tbody tr:hover {
                     
                     <td>7.96</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18413,8 +17796,6 @@ tbody tr:hover {
                     
                     <td>7.28</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18458,8 +17839,6 @@ tbody tr:hover {
                     <td>10.12055389</td>
                     
                     <td>0.22</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -18525,8 +17904,6 @@ tbody tr:hover {
                     
                     <td>6.60</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18580,8 +17957,6 @@ tbody tr:hover {
                     <td>3.80</td>
                     
                     <td>0.38</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -18637,8 +18012,6 @@ tbody tr:hover {
                     
                     <td>3.40</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18692,8 +18065,6 @@ tbody tr:hover {
                     <td>3.31</td>
                     
                     <td>2.17</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -18749,8 +18120,6 @@ tbody tr:hover {
                     
                     <td>3.83</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18804,8 +18173,6 @@ tbody tr:hover {
                     <td>3.26</td>
                     
                     <td>6.90</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -18861,8 +18228,6 @@ tbody tr:hover {
                     
                     <td>0.25</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -18906,8 +18271,6 @@ tbody tr:hover {
                     <td>-0.157842376</td>
                     
                     <td>0.20</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -18973,8 +18336,6 @@ tbody tr:hover {
                     
                     <td>0.01</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19029,8 +18390,6 @@ tbody tr:hover {
                     
                     <td>17.20</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19074,8 +18433,6 @@ tbody tr:hover {
                     <td>4.012106512</td>
                     
                     <td>0.26</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -19141,8 +18498,6 @@ tbody tr:hover {
                     
                     <td>0.93</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19196,8 +18551,6 @@ tbody tr:hover {
                     <td>2.96</td>
                     
                     <td>5.19</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -19253,8 +18606,6 @@ tbody tr:hover {
                     
                     <td>1.79</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19298,8 +18649,6 @@ tbody tr:hover {
                     <td>0.497378594</td>
                     
                     <td>0.26</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -19365,8 +18714,6 @@ tbody tr:hover {
                     
                     <td>3.71</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19410,8 +18757,6 @@ tbody tr:hover {
                     <td>-4.394999269</td>
                     
                     <td>0.25</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -19477,8 +18822,6 @@ tbody tr:hover {
                     
                     <td>5.91</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19532,8 +18875,6 @@ tbody tr:hover {
                     <td>5.88</td>
                     
                     <td>6.04</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -19589,8 +18930,6 @@ tbody tr:hover {
                     
                     <td>2.50</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19644,8 +18983,6 @@ tbody tr:hover {
                     <td>2.66</td>
                     
                     <td>1.99</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -19701,8 +19038,6 @@ tbody tr:hover {
                     
                     <td>5.51</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19756,8 +19091,6 @@ tbody tr:hover {
                     <td>4.27</td>
                     
                     <td>0.49</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -19813,8 +19146,6 @@ tbody tr:hover {
                     
                     <td>4.11</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19869,8 +19200,6 @@ tbody tr:hover {
                     
                     <td>2.20</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -19914,8 +19243,6 @@ tbody tr:hover {
                     <td>-0.85326485</td>
                     
                     <td>0.04</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -19981,8 +19308,6 @@ tbody tr:hover {
                     
                     <td>2.87</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20037,8 +19362,6 @@ tbody tr:hover {
                     
                     <td>2.62</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20082,8 +19405,6 @@ tbody tr:hover {
                     <td>4.827674403</td>
                     
                     <td>0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -20149,8 +19470,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20204,8 +19523,6 @@ tbody tr:hover {
                     <td>2.18</td>
                     
                     <td>4.73</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -20261,8 +19578,6 @@ tbody tr:hover {
                     
                     <td>3.71</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20306,8 +19621,6 @@ tbody tr:hover {
                     <td>8.199487303</td>
                     
                     <td>0.03</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -20373,8 +19686,6 @@ tbody tr:hover {
                     
                     <td>6.21</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20428,8 +19739,6 @@ tbody tr:hover {
                     <td>2.15</td>
                     
                     <td>0.24</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -20485,8 +19794,6 @@ tbody tr:hover {
                     
                     <td>5.44</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20540,8 +19847,6 @@ tbody tr:hover {
                     <td>2.59</td>
                     
                     <td>2.83</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -20597,8 +19902,6 @@ tbody tr:hover {
                     
                     <td>2.55</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20652,8 +19955,6 @@ tbody tr:hover {
                     <td>3.52</td>
                     
                     <td>2.47</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -20709,8 +20010,6 @@ tbody tr:hover {
                     
                     <td>5.44</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20764,8 +20063,6 @@ tbody tr:hover {
                     <td>2.05</td>
                     
                     <td>1.91</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -20821,8 +20118,6 @@ tbody tr:hover {
                     
                     <td>3.24</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20877,8 +20172,6 @@ tbody tr:hover {
                     
                     <td>6.35</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -20922,8 +20215,6 @@ tbody tr:hover {
                     <td>0.745004571</td>
                     
                     <td>0.01</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -20989,8 +20280,6 @@ tbody tr:hover {
                     
                     <td>1.82</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21034,8 +20323,6 @@ tbody tr:hover {
                     <td>-4.053334554</td>
                     
                     <td>0.01</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21101,8 +20388,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21157,8 +20442,6 @@ tbody tr:hover {
                     
                     <td>6.03</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21202,8 +20485,6 @@ tbody tr:hover {
                     <td>-9.759376328</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21269,8 +20550,6 @@ tbody tr:hover {
                     
                     <td>2.26</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21325,8 +20604,6 @@ tbody tr:hover {
                     
                     <td>5.43</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21370,8 +20647,6 @@ tbody tr:hover {
                     <td>7.239086096</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21437,8 +20712,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21482,8 +20755,6 @@ tbody tr:hover {
                     <td>-2.747024086</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21549,8 +20820,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21594,8 +20863,6 @@ tbody tr:hover {
                     <td>-2.084201771</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21661,8 +20928,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21706,8 +20971,6 @@ tbody tr:hover {
                     <td>1.19582544</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21773,8 +21036,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21818,8 +21079,6 @@ tbody tr:hover {
                     <td>13.81443456</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21885,8 +21144,6 @@ tbody tr:hover {
                     
                     <td>11.69</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -21930,8 +21187,6 @@ tbody tr:hover {
                     <td>-5.819212668</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -21997,8 +21252,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22042,8 +21295,6 @@ tbody tr:hover {
                     <td>4.257353948</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22109,8 +21360,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22154,8 +21403,6 @@ tbody tr:hover {
                     <td>9.431818182</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22221,8 +21468,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22266,8 +21511,6 @@ tbody tr:hover {
                     <td>-3.930133849</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22333,8 +21576,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22378,8 +21619,6 @@ tbody tr:hover {
                     <td>-3.279881928</td>
                     
                     <td>0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22445,8 +21684,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22490,8 +21727,6 @@ tbody tr:hover {
                     <td>-12.99733461</td>
                     
                     <td>-0.19</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22557,8 +21792,6 @@ tbody tr:hover {
                     
                     <td>8.17</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22612,8 +21845,6 @@ tbody tr:hover {
                     <td>4.84</td>
                     
                     <td>4.99</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -22669,8 +21900,6 @@ tbody tr:hover {
                     
                     <td>7.36</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22714,8 +21943,6 @@ tbody tr:hover {
                     <td>8.764576866</td>
                     
                     <td>-0.24</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22781,8 +22008,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22837,8 +22062,6 @@ tbody tr:hover {
                     
                     <td>0.30</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22882,8 +22105,6 @@ tbody tr:hover {
                     <td>-3.680364182</td>
                     
                     <td>-0.23</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -22949,8 +22170,6 @@ tbody tr:hover {
                     
                     <td>2.10</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -22994,8 +22213,6 @@ tbody tr:hover {
                     <td>-1.348184625</td>
                     
                     <td>-0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -23061,8 +22278,6 @@ tbody tr:hover {
                     
                     <td>15.31</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23106,8 +22321,6 @@ tbody tr:hover {
                     <td>11.79959764</td>
                     
                     <td>-0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -23173,8 +22386,6 @@ tbody tr:hover {
                     
                     <td>0.14</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23228,8 +22439,6 @@ tbody tr:hover {
                     <td>3.29</td>
                     
                     <td>0.91</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -23285,8 +22494,6 @@ tbody tr:hover {
                     
                     <td>3.15</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23340,8 +22547,6 @@ tbody tr:hover {
                     <td>4.62</td>
                     
                     <td>7.31</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -23397,8 +22602,6 @@ tbody tr:hover {
                     
                     <td>9.37</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23452,8 +22655,6 @@ tbody tr:hover {
                     <td>3.90</td>
                     
                     <td>0.09</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -23509,8 +22710,6 @@ tbody tr:hover {
                     
                     <td>3.66</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23565,8 +22764,6 @@ tbody tr:hover {
                     
                     <td>2.87</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23610,8 +22807,6 @@ tbody tr:hover {
                     <td>-6.473966633</td>
                     
                     <td>-0.20</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -23677,8 +22872,6 @@ tbody tr:hover {
                     
                     <td>4.53</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23722,8 +22915,6 @@ tbody tr:hover {
                     <td>3.471113012</td>
                     
                     <td>-0.21</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -23789,8 +22980,6 @@ tbody tr:hover {
                     
                     <td>3.80</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23845,8 +23034,6 @@ tbody tr:hover {
                     
                     <td>1.62</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -23890,8 +23077,6 @@ tbody tr:hover {
                     <td>0.200589888</td>
                     
                     <td>-0.15</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -23957,8 +23142,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24012,8 +23195,6 @@ tbody tr:hover {
                     <td>2.78</td>
                     
                     <td>4.19</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -24069,8 +23250,6 @@ tbody tr:hover {
                     
                     <td>0.57</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24124,8 +23303,6 @@ tbody tr:hover {
                     <td>4.51</td>
                     
                     <td>2.38</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -24181,8 +23358,6 @@ tbody tr:hover {
                     
                     <td>6.18</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24237,8 +23412,6 @@ tbody tr:hover {
                     
                     <td>9.45</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24282,8 +23455,6 @@ tbody tr:hover {
                     <td>1.628867867</td>
                     
                     <td>-0.20</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -24349,8 +23520,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24394,8 +23563,6 @@ tbody tr:hover {
                     <td>10.40987093</td>
                     
                     <td>-0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -24461,8 +23628,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24517,8 +23682,6 @@ tbody tr:hover {
                     
                     <td>2.44</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24562,8 +23725,6 @@ tbody tr:hover {
                     <td>2.992757161</td>
                     
                     <td>-0.18</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -24629,8 +23790,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24684,8 +23843,6 @@ tbody tr:hover {
                     <td>2.87</td>
                     
                     <td>5.78</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -24741,8 +23898,6 @@ tbody tr:hover {
                     
                     <td>4.35</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24786,8 +23941,6 @@ tbody tr:hover {
                     <td>-5.625757373</td>
                     
                     <td>-0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -24853,8 +24006,6 @@ tbody tr:hover {
                     
                     <td>1.54</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -24898,8 +24049,6 @@ tbody tr:hover {
                     <td>-2.912618662</td>
                     
                     <td>-0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -24965,8 +24114,6 @@ tbody tr:hover {
                     
                     <td>4.79</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25021,8 +24168,6 @@ tbody tr:hover {
                     
                     <td>1.08</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25066,8 +24211,6 @@ tbody tr:hover {
                     <td>7.206016038</td>
                     
                     <td>-0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -25133,8 +24276,6 @@ tbody tr:hover {
                     
                     <td>0.50</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25188,8 +24329,6 @@ tbody tr:hover {
                     <td>2.35</td>
                     
                     <td>0.72</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -25245,8 +24384,6 @@ tbody tr:hover {
                     
                     <td>1.11</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25300,8 +24437,6 @@ tbody tr:hover {
                     <td>4.07</td>
                     
                     <td>5.30</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -25357,8 +24492,6 @@ tbody tr:hover {
                     
                     <td>5.59</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25412,8 +24545,6 @@ tbody tr:hover {
                     <td>2.55</td>
                     
                     <td>0.75</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -25469,8 +24600,6 @@ tbody tr:hover {
                     
                     <td>6.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25524,8 +24653,6 @@ tbody tr:hover {
                     <td>5.55</td>
                     
                     <td>12.44</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -25581,8 +24708,6 @@ tbody tr:hover {
                     
                     <td>3.60</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25636,8 +24761,6 @@ tbody tr:hover {
                     <td>5.63</td>
                     
                     <td>13.07</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -25693,8 +24816,6 @@ tbody tr:hover {
                     
                     <td>0.01</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25749,8 +24870,6 @@ tbody tr:hover {
                     
                     <td>0.58</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25794,8 +24913,6 @@ tbody tr:hover {
                     <td>1.048822683</td>
                     
                     <td>-0.12</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -25861,8 +24978,6 @@ tbody tr:hover {
                     
                     <td>4.21</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25917,8 +25032,6 @@ tbody tr:hover {
                     
                     <td>5.76</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -25962,8 +25075,6 @@ tbody tr:hover {
                     <td>-12.50335898</td>
                     
                     <td>-0.12</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26029,8 +25140,6 @@ tbody tr:hover {
                     
                     <td>1.67</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26085,8 +25194,6 @@ tbody tr:hover {
                     
                     <td>2.51</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26130,8 +25237,6 @@ tbody tr:hover {
                     <td>24.29261755</td>
                     
                     <td>-0.13</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26197,8 +25302,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26242,8 +25345,6 @@ tbody tr:hover {
                     <td>-7.554842455</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26309,8 +25410,6 @@ tbody tr:hover {
                     
                     <td>0.80</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26365,8 +25464,6 @@ tbody tr:hover {
                     
                     <td>0.39</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26410,8 +25507,6 @@ tbody tr:hover {
                     <td>10.23510209</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26477,8 +25572,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26522,8 +25615,6 @@ tbody tr:hover {
                     <td>1.723051665</td>
                     
                     <td>-0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26589,8 +25680,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26645,8 +25734,6 @@ tbody tr:hover {
                     
                     <td>3.00</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26690,8 +25777,6 @@ tbody tr:hover {
                     <td>5.480293475</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26757,8 +25842,6 @@ tbody tr:hover {
                     
                     <td>3.04</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26802,8 +25885,6 @@ tbody tr:hover {
                     <td>0.676871125</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26869,8 +25950,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -26914,8 +25993,6 @@ tbody tr:hover {
                     <td>-2.449421965</td>
                     
                     <td>-0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -26981,8 +26058,6 @@ tbody tr:hover {
                     
                     <td>6.71</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27036,8 +26111,6 @@ tbody tr:hover {
                     <td>2.54</td>
                     
                     <td>1.35</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -27093,8 +26166,6 @@ tbody tr:hover {
                     
                     <td>5.45</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27149,8 +26220,6 @@ tbody tr:hover {
                     
                     <td>0.79</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27194,8 +26263,6 @@ tbody tr:hover {
                     <td>0.519268711</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -27261,8 +26328,6 @@ tbody tr:hover {
                     
                     <td>6.59</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27316,8 +26381,6 @@ tbody tr:hover {
                     <td>3.62</td>
                     
                     <td>3.20</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -27373,8 +26436,6 @@ tbody tr:hover {
                     
                     <td>4.14</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27418,8 +26479,6 @@ tbody tr:hover {
                     <td>-0.942359831</td>
                     
                     <td>-0.08</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -27485,8 +26544,6 @@ tbody tr:hover {
                     
                     <td>2.84</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27541,8 +26598,6 @@ tbody tr:hover {
                     
                     <td>8.74</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27586,8 +26641,6 @@ tbody tr:hover {
                     <td>28.97059228</td>
                     
                     <td>-0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -27653,8 +26706,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27709,8 +26760,6 @@ tbody tr:hover {
                     
                     <td>4.27</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27754,8 +26803,6 @@ tbody tr:hover {
                     <td>-10.90269272</td>
                     
                     <td>-0.11</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -27821,8 +26868,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27877,8 +26922,6 @@ tbody tr:hover {
                     
                     <td>9.58</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -27922,8 +26965,6 @@ tbody tr:hover {
                     <td>6.479093331</td>
                     
                     <td>-0.10</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -27989,8 +27030,6 @@ tbody tr:hover {
                     
                     <td>12.36</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28045,8 +27084,6 @@ tbody tr:hover {
                     
                     <td>8.52</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28090,8 +27127,6 @@ tbody tr:hover {
                     <td>4.592591745</td>
                     
                     <td>-0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -28157,8 +27192,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28202,8 +27235,6 @@ tbody tr:hover {
                     <td>-3.216511832</td>
                     
                     <td>-0.06</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -28269,8 +27300,6 @@ tbody tr:hover {
                     
                     <td>2.43</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28324,8 +27353,6 @@ tbody tr:hover {
                     <td>5.89</td>
                     
                     <td>2.85</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -28381,8 +27408,6 @@ tbody tr:hover {
                     
                     <td>10.36</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28436,8 +27461,6 @@ tbody tr:hover {
                     <td>4.16</td>
                     
                     <td>3.10</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -28493,8 +27516,6 @@ tbody tr:hover {
                     
                     <td>0.78</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28548,8 +27569,6 @@ tbody tr:hover {
                     <td>2.23</td>
                     
                     <td>3.36</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -28605,8 +27624,6 @@ tbody tr:hover {
                     
                     <td>0.84</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28650,8 +27667,6 @@ tbody tr:hover {
                     <td>-5.864096833</td>
                     
                     <td>-0.08</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -28717,8 +27732,6 @@ tbody tr:hover {
                     
                     <td>1.92</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28762,8 +27775,6 @@ tbody tr:hover {
                     <td>10.23908179</td>
                     
                     <td>-0.09</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -28829,8 +27840,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28874,8 +27883,6 @@ tbody tr:hover {
                     <td>5.975893591</td>
                     
                     <td>-0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -28941,8 +27948,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -28986,8 +27991,6 @@ tbody tr:hover {
                     <td>2.071003717</td>
                     
                     <td>-0.07</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -29053,8 +28056,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29108,8 +28109,6 @@ tbody tr:hover {
                     <td>3.29</td>
                     
                     <td>8.07</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -29165,8 +28164,6 @@ tbody tr:hover {
                     
                     <td>7.22</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29221,8 +28218,6 @@ tbody tr:hover {
                     
                     <td>3.81</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29266,8 +28261,6 @@ tbody tr:hover {
                     <td>2.270670858</td>
                     
                     <td>-0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -29333,8 +28326,6 @@ tbody tr:hover {
                     
                     <td>1.49</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29378,8 +28369,6 @@ tbody tr:hover {
                     <td>-17.72847359</td>
                     
                     <td>-0.56</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -29445,8 +28434,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29500,8 +28487,6 @@ tbody tr:hover {
                     <td>2.05</td>
                     
                     <td>1.30</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -29557,8 +28542,6 @@ tbody tr:hover {
                     
                     <td>4.29</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29613,8 +28596,6 @@ tbody tr:hover {
                     
                     <td>20.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29658,8 +28639,6 @@ tbody tr:hover {
                     <td>4.233464935</td>
                     
                     <td>-0.38</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -29725,8 +28704,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29781,8 +28758,6 @@ tbody tr:hover {
                     
                     <td>1.16</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29826,8 +28801,6 @@ tbody tr:hover {
                     <td>1.477003688</td>
                     
                     <td>-0.07</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -29893,8 +28866,6 @@ tbody tr:hover {
                     
                     <td>19.43</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -29938,8 +28909,6 @@ tbody tr:hover {
                     <td>15.01138813</td>
                     
                     <td>-0.06</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -30005,8 +28974,6 @@ tbody tr:hover {
                     
                     <td>5.09</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30060,8 +29027,6 @@ tbody tr:hover {
                     <td>5.17</td>
                     
                     <td>8.46</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -30117,8 +29082,6 @@ tbody tr:hover {
                     
                     <td>3.06</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30162,8 +29125,6 @@ tbody tr:hover {
                     <td>9.076247591</td>
                     
                     <td>-0.06</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -30229,8 +29190,6 @@ tbody tr:hover {
                     
                     <td>14.02</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30284,8 +29243,6 @@ tbody tr:hover {
                     <td>2.95</td>
                     
                     <td>2.32</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -30341,8 +29298,6 @@ tbody tr:hover {
                     
                     <td>5.25</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30397,8 +29352,6 @@ tbody tr:hover {
                     
                     <td>4.40</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30442,8 +29395,6 @@ tbody tr:hover {
                     <td>9.674281529</td>
                     
                     <td>-0.06</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -30509,8 +29460,6 @@ tbody tr:hover {
                     
                     <td>6.02</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30564,8 +29513,6 @@ tbody tr:hover {
                     <td>5.10</td>
                     
                     <td>9.97</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -30621,8 +29568,6 @@ tbody tr:hover {
                     
                     <td>5.27</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30666,8 +29611,6 @@ tbody tr:hover {
                     <td>-7.398221936</td>
                     
                     <td>-0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -30733,8 +29676,6 @@ tbody tr:hover {
                     
                     <td>3.30</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30788,8 +29729,6 @@ tbody tr:hover {
                     <td>2.47</td>
                     
                     <td>2.96</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -30845,8 +29784,6 @@ tbody tr:hover {
                     
                     <td>4.44</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -30900,8 +29837,6 @@ tbody tr:hover {
                     <td>2.69</td>
                     
                     <td>3.87</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -30957,8 +29892,6 @@ tbody tr:hover {
                     
                     <td>0.64</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31002,8 +29935,6 @@ tbody tr:hover {
                     <td>-1.459799095</td>
                     
                     <td>-0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31069,8 +30000,6 @@ tbody tr:hover {
                     
                     <td>2.54</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31114,8 +30043,6 @@ tbody tr:hover {
                     <td>-2.017649931</td>
                     
                     <td>-0.04</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31181,8 +30108,6 @@ tbody tr:hover {
                     
                     <td>1.92</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31226,8 +30151,6 @@ tbody tr:hover {
                     <td>-9.154499653</td>
                     
                     <td>-0.42</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31293,8 +30216,6 @@ tbody tr:hover {
                     
                     <td>1.60</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31338,8 +30259,6 @@ tbody tr:hover {
                     <td>-15.40664062</td>
                     
                     <td>-0.34</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31405,8 +30324,6 @@ tbody tr:hover {
                     
                     <td>3.81</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31461,8 +30378,6 @@ tbody tr:hover {
                     
                     <td>1.03</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31506,8 +30421,6 @@ tbody tr:hover {
                     <td>-11.6057704</td>
                     
                     <td>-0.38</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31573,8 +30486,6 @@ tbody tr:hover {
                     
                     <td>2.15</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31628,8 +30539,6 @@ tbody tr:hover {
                     <td>3.77</td>
                     
                     <td>1.41</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -31685,8 +30594,6 @@ tbody tr:hover {
                     
                     <td>10.50</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31741,8 +30648,6 @@ tbody tr:hover {
                     
                     <td>5.00</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31786,8 +30691,6 @@ tbody tr:hover {
                     <td>-0.266671317</td>
                     
                     <td>-0.30</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31853,8 +30756,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -31898,8 +30799,6 @@ tbody tr:hover {
                     <td>-2.733919913</td>
                     
                     <td>-0.30</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -31965,8 +30864,6 @@ tbody tr:hover {
                     
                     <td>2.19</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32021,8 +30918,6 @@ tbody tr:hover {
                     
                     <td>2.22</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32066,8 +30961,6 @@ tbody tr:hover {
                     <td>-3.282212333</td>
                     
                     <td>-0.35</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32133,8 +31026,6 @@ tbody tr:hover {
                     
                     <td>2.30</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32188,8 +31079,6 @@ tbody tr:hover {
                     <td>2.12</td>
                     
                     <td>1.68</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -32245,8 +31134,6 @@ tbody tr:hover {
                     
                     <td>11.56</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32300,8 +31187,6 @@ tbody tr:hover {
                     <td>2.03</td>
                     
                     <td>7.06</td>
-                    
-                    <td>2.0</td>
                     
                 </tr>
                 
@@ -32357,8 +31242,6 @@ tbody tr:hover {
                     
                     <td>4.06</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32402,8 +31285,6 @@ tbody tr:hover {
                     <td>9.183600363</td>
                     
                     <td>-0.28</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32469,8 +31350,6 @@ tbody tr:hover {
                     
                     <td>2.35</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32514,8 +31393,6 @@ tbody tr:hover {
                     <td>-6.542059257</td>
                     
                     <td>-0.29</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32581,8 +31458,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32626,8 +31501,6 @@ tbody tr:hover {
                     <td>-3.543307087</td>
                     
                     <td>-0.24</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32693,8 +31566,6 @@ tbody tr:hover {
                     
                     <td>2.29</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32738,8 +31609,6 @@ tbody tr:hover {
                     <td>7.036788753</td>
                     
                     <td>-0.24</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32805,8 +31674,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32850,8 +31717,6 @@ tbody tr:hover {
                     <td>-0.728819204</td>
                     
                     <td>-0.23</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -32917,8 +31782,6 @@ tbody tr:hover {
                     
                     <td>0.35</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -32972,8 +31835,6 @@ tbody tr:hover {
                     <td>4.17</td>
                     
                     <td>4.57</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -33029,8 +31890,6 @@ tbody tr:hover {
                     
                     <td>0.38</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33074,8 +31933,6 @@ tbody tr:hover {
                     <td>-3.338249053</td>
                     
                     <td>-0.32</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -33141,8 +31998,6 @@ tbody tr:hover {
                     
                     <td>2.00</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33186,8 +32041,6 @@ tbody tr:hover {
                     <td>-0.494445801</td>
                     
                     <td>-0.22</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -33253,8 +32106,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33298,8 +32149,6 @@ tbody tr:hover {
                     <td>-1.149052267</td>
                     
                     <td>-0.25</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -33365,8 +32214,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33421,8 +32268,6 @@ tbody tr:hover {
                     
                     <td>3.55</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33466,8 +32311,6 @@ tbody tr:hover {
                     <td>-5.009622861</td>
                     
                     <td>-0.25</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -33533,8 +32376,6 @@ tbody tr:hover {
                     
                     <td>2.54</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33589,8 +32430,6 @@ tbody tr:hover {
                     
                     <td>0.98</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33634,8 +32473,6 @@ tbody tr:hover {
                     <td>-0.259258129</td>
                     
                     <td>-0.17</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -33701,8 +32538,6 @@ tbody tr:hover {
                     
                     <td>1.32</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33756,8 +32591,6 @@ tbody tr:hover {
                     <td>2.82</td>
                     
                     <td>4.62</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -33813,8 +32646,6 @@ tbody tr:hover {
                     
                     <td>3.41</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33868,8 +32699,6 @@ tbody tr:hover {
                     <td>3.34</td>
                     
                     <td>0.31</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -33925,8 +32754,6 @@ tbody tr:hover {
                     
                     <td>3.95</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -33981,8 +32808,6 @@ tbody tr:hover {
                     
                     <td>2.91</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34026,8 +32851,6 @@ tbody tr:hover {
                     <td>-1.45198044</td>
                     
                     <td>-0.25</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -34093,8 +32916,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34149,8 +32970,6 @@ tbody tr:hover {
                     
                     <td>0.14</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34194,8 +33013,6 @@ tbody tr:hover {
                     <td>-5.601719198</td>
                     
                     <td>-0.24</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -34261,8 +33078,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34306,8 +33121,6 @@ tbody tr:hover {
                     <td>4.016263371</td>
                     
                     <td>-0.05</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -34373,8 +33186,6 @@ tbody tr:hover {
                     
                     <td>3.74</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34428,8 +33239,6 @@ tbody tr:hover {
                     <td>4.99</td>
                     
                     <td>0.13</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -34485,8 +33294,6 @@ tbody tr:hover {
                     
                     <td>4.37</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34530,8 +33337,6 @@ tbody tr:hover {
                     <td>11.80679341</td>
                     
                     <td>-0.03</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -34597,8 +33402,6 @@ tbody tr:hover {
                     
                     <td>0.04</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34652,8 +33455,6 @@ tbody tr:hover {
                     <td>4.88</td>
                     
                     <td>5.62</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -34709,8 +33510,6 @@ tbody tr:hover {
                     
                     <td>1.88</td>
                     
-                    <td>3.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34764,8 +33563,6 @@ tbody tr:hover {
                     <td>5.22</td>
                     
                     <td>11.83</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -34821,8 +33618,6 @@ tbody tr:hover {
                     
                     <td>1.35</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34877,8 +33672,6 @@ tbody tr:hover {
                     
                     <td>10.08</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -34922,8 +33715,6 @@ tbody tr:hover {
                     <td>11.0815373</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -34989,8 +33780,6 @@ tbody tr:hover {
                     
                     <td>3.65</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35034,8 +33823,6 @@ tbody tr:hover {
                     <td>3.760246072</td>
                     
                     <td>-0.03</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35101,8 +33888,6 @@ tbody tr:hover {
                     
                     <td>3.58</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35146,8 +33931,6 @@ tbody tr:hover {
                     <td>-1.364861566</td>
                     
                     <td>-0.03</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35213,8 +33996,6 @@ tbody tr:hover {
                     
                     <td>0.27</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35258,8 +34039,6 @@ tbody tr:hover {
                     <td>0.896021595</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35325,8 +34104,6 @@ tbody tr:hover {
                     
                     <td>1.63</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35370,8 +34147,6 @@ tbody tr:hover {
                     <td>17.12432037</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35437,8 +34212,6 @@ tbody tr:hover {
                     
                     <td>6.73</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35482,8 +34255,6 @@ tbody tr:hover {
                     <td>8.193098416</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35549,8 +34320,6 @@ tbody tr:hover {
                     
                     <td>6.76</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35605,8 +34374,6 @@ tbody tr:hover {
                     
                     <td>1.92</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35650,8 +34417,6 @@ tbody tr:hover {
                     <td>11.89185462</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35717,8 +34482,6 @@ tbody tr:hover {
                     
                     <td>12.83</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35772,8 +34535,6 @@ tbody tr:hover {
                     <td>3.66</td>
                     
                     <td>2.25</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -35829,8 +34590,6 @@ tbody tr:hover {
                     
                     <td>0.99</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35874,8 +34633,6 @@ tbody tr:hover {
                     <td>3.463411231</td>
                     
                     <td>-0.02</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -35941,8 +34698,6 @@ tbody tr:hover {
                     
                     <td>6.34</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -35997,8 +34752,6 @@ tbody tr:hover {
                     
                     <td>4.40</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36042,8 +34795,6 @@ tbody tr:hover {
                     <td>-4.922405504</td>
                     
                     <td>-0.01</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -36109,8 +34860,6 @@ tbody tr:hover {
                     
                     <td>nan</td>
                     
-                    <td>nan</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36165,8 +34914,6 @@ tbody tr:hover {
                     
                     <td>3.62</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36210,8 +34957,6 @@ tbody tr:hover {
                     <td>25.53908356</td>
                     
                     <td>-0.01</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -36277,8 +35022,6 @@ tbody tr:hover {
                     
                     <td>4.64</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36332,8 +35075,6 @@ tbody tr:hover {
                     <td>4.18</td>
                     
                     <td>3.91</td>
-                    
-                    <td>1.0</td>
                     
                 </tr>
                 
@@ -36389,8 +35130,6 @@ tbody tr:hover {
                     
                     <td>6.02</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36434,8 +35173,6 @@ tbody tr:hover {
                     <td>-2.305804841</td>
                     
                     <td>-0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -36501,8 +35238,6 @@ tbody tr:hover {
                     
                     <td>8.93</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36557,8 +35292,6 @@ tbody tr:hover {
                     
                     <td>7.89</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36602,8 +35335,6 @@ tbody tr:hover {
                     <td>-2.035923548</td>
                     
                     <td>-0.00</td>
-                    
-                    <td>nan</td>
                     
                     <td>nan</td>
                     
@@ -36669,8 +35400,6 @@ tbody tr:hover {
                     
                     <td>1.21</td>
                     
-                    <td>2.0</td>
-                    
                 </tr>
                 
                 <tr>
@@ -36724,8 +35453,6 @@ tbody tr:hover {
                     <td>2.37</td>
                     
                     <td>2.37</td>
-                    
-                    <td>3.0</td>
                     
                 </tr>
                 
@@ -36781,8 +35508,6 @@ tbody tr:hover {
                     
                     <td>6.90</td>
                     
-                    <td>1.0</td>
-                    
                 </tr>
                 
             </tbody>
@@ -36795,8 +35520,8 @@ $(document).ready(function() {
     // Initialize DataTable
     var table = $('#stock-table').DataTable({
         dom: 'Bfrtip',
-        pageLength: 30, // Set default page length to 30
-        lengthMenu: [ [10, 30, 50, 100], [10, 30, 50, 100] ], // Options for changing page length
+        pageLength: 30,
+        lengthMenu: [ [10, 30, 50, 100], [10, 30, 50, 100] ],
         buttons: [
             {
                 extend: 'csvHtml5',
@@ -36888,7 +35613,7 @@ $(document).ready(function() {
 
         // Add event listener for delete filter button
         $(`#delete-filter-${filterIndex}`).on('click', function() {
-            $(`#filter-group-${filterIndex}`).remove(); // Remove the filter group
+            $(`#filter-group-${filterIndex}`).remove();
         });
     });
 
@@ -36915,17 +35640,15 @@ $(document).ready(function() {
             }
         });
 
-        $(`#filter-type-${index}`).trigger('change'); // Trigger the change event to show the inputs
+        $(`#filter-type-${index}`).trigger('change');
     }
 
     // Apply Filters
     $('#apply-filter').on('click', function() {
-        // Clear any previous custom filters
         $.fn.dataTable.ext.search = [];
 
-        // Loop through each filter group and apply the corresponding filters
         $('.filter-group').each(function() {
-            var index = $(this).attr('id').split('-')[2]; // Get the filter index
+            var index = $(this).attr('id').split('-')[2];
             var columnIndex = $(`#column-select-${index}`).val();
             var filterType = $(`#filter-type-${index}`).val();
 
@@ -36934,74 +35657,67 @@ $(document).ready(function() {
                 table.column(columnIndex).search(value).draw();
             } else if (filterType === 'contains') {
                 var value = $(`#filter-value-${index}`).val();
-                table.column(columnIndex).search(value, true, false).draw(); // Partial match (contains)
+                table.column(columnIndex).search(value, true, false).draw();
             } else if (filterType === 'greater-than') {
                 var value = parseFloat($(`#filter-value-${index}`).val());
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        // Get the column value and convert it to a number
-                        var columnValue = parseFloat(data[columnIndex]) || 0;
-                        return columnValue > value;
-                    }
-                );
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var columnValue = parseFloat(data[columnIndex]) || 0;
+                    return columnValue > value;
+                });
             } else if (filterType === 'less-than') {
                 var value = parseFloat($(`#filter-value-${index}`).val());
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        // Get the column value and convert it to a number
-                        var columnValue = parseFloat(data[columnIndex]) || 0;
-                        return columnValue < value;
-                    }
-                );
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var columnValue = parseFloat(data[columnIndex]) || 0;
+                    return columnValue < value;
+                });
             } else if (filterType === 'range') {
                 var minValue = parseFloat($(`#min-value-${index}`).val());
                 var maxValue = parseFloat($(`#max-value-${index}`).val());
 
-                // Custom filter for range
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        var value = parseFloat(data[columnIndex]) || 0; // Get the column value
-                        if ((isNaN(minValue) && isNaN(maxValue)) ||
-                            (isNaN(minValue) && value <= maxValue) ||
-                            (minValue <= value && isNaN(maxValue)) ||
-                            (minValue <= value && value <= maxValue)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                );
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var value = parseFloat(data[columnIndex]) || 0;
+                    return (isNaN(minValue) && isNaN(maxValue)) ||
+                        (isNaN(minValue) && value <= maxValue) ||
+                        (minValue <= value && isNaN(maxValue)) ||
+                        (minValue <= value && value <= maxValue);
+                });
             } else if (filterType === 'date-range') {
                 var startDate = $(`#start-date-${index}`).val();
                 var endDate = $(`#end-date-${index}`).val();
 
-                // Custom filter for date range
-                $.fn.dataTable.ext.search.push(
-                    function(settings, data, dataIndex) {
-                        var date = data[columnIndex]; // Get the date from the column
-                        if ((startDate === '' && endDate === '') ||
-                            (startDate === '' && date <= endDate) ||
-                            (startDate <= date && endDate === '') ||
-                            (startDate <= date && date <= endDate)) {
-                            return true;
-                        }
-                        return false;
-                    }
-                );
+                $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+                    var date = data[columnIndex];
+                    return (startDate === '' && endDate === '') ||
+                        (startDate === '' && date <= endDate) ||
+                        (startDate <= date && endDate === '') ||
+                        (startDate <= date && date <= endDate);
+                });
             }
         });
 
-        table.draw(); // Redraw the table with the applied filters
+        table.draw();
     });
 
     // Reset Filters
     $('#reset-filters').on('click', function() {
-        // Clear all filters from the filter container
         $('#filter-container').empty();
         filterIndex = 0;
 
-        // Clear DataTables search and filters
         table.search('').columns().search('').draw();
-        $.fn.dataTable.ext.search = []; // Clear any custom filters
+        $.fn.dataTable.ext.search = [];
+    });
+
+    // Delete column when cross (×) icon is clicked
+    $('.delete-column-btn').on('click', function() {
+        var columnIdx = $(this).data('column');
+        table.column(columnIdx).visible(false);
+    });
+
+    // Reset all columns when "Reset All Columns" button is clicked
+    $('#reset-columns').on('click', function() {
+        table.columns().every(function(index) {
+            this.visible(true); // Make all columns visible again
+        });
     });
 
     // Initialize first filter
