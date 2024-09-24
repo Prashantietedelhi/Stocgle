@@ -221,6 +221,7 @@
     align-items: flex-start;
 }
 
+/* Filter section */
 .filter-section {
     background-color: #f9f9f9;
     padding: 20px;
@@ -230,30 +231,42 @@
     z-index: 1000; /* Ensures filter section stays above the table */
     position: sticky;
     top: 0;
+    max-height: 80vh; /* Limit the height to make it scrollable */
+    overflow-y: auto; /* Scroll if content overflows */
 }
 
-/* Adjust filter section width for tablets */
+/* Adjust filter section for tablets */
 @media (max-width: 1024px) {
     .filter-section {
-        width: 300px; /* Slightly smaller for tablets */
+        width: 300px; /* Smaller width for tablets */
+        position: relative; /* No sticky position on tablet and mobile */
+        max-height: none; /* Remove height limitation */
+        overflow-y: visible; /* No overflow handling */
     }
 }
 
-/* Adjust filter section width for mobile devices */
+/* Adjust filter section for mobile devices */
 @media (max-width: 768px) {
     .filter-section {
-        width: 100%; /* Full width for mobile screens */
-        padding: 15px; /* Slightly reduced padding for mobile */
+        width: 100%; /* Full width on mobile */
+        padding: 15px;
+        position: relative; /* Disable sticky positioning on mobile */
+        max-height: none;
+        overflow-y: visible;
     }
 }
 
 /* Adjustments for very small mobile devices */
 @media (max-width: 480px) {
     .filter-section {
-        width: 100%; /* Full width for small mobile devices */
-        padding: 10px; /* Further reduce padding */
+        width: 100%; /* Full width for small mobile */
+        padding: 10px;
+        position: relative; /* Disable sticky positioning */
+        max-height: none;
+        overflow-y: visible;
     }
 }
+
 
 /* Add space between each filter and input field */
 .filter-group {
