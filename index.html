@@ -35807,22 +35807,16 @@ $(document).ready(function() {
 
  function loadTradingViewChart(symbol) {
         new TradingView.widget({
-            "width": "100%",
-            "height": 500,
-            "symbol": formattedSymbol,
-            "interval": "D",  // Daily chart
-            "timezone": "Etc/UTC",
-            "theme": "light",  // Light theme
-            "style": "1",  // '1' for Line chart (Simple line chart)
-            "toolbar_bg": "#f1f3f6",
-            "withdateranges": true,
-            "allow_symbol_change": true,
-            "container_id": "tradingview_chart",
-           "studies": [
-    "Volume@tv-basicstudies",  // Volume
-    "RSI@tv-basicstudies",     // RSI
-    "BollingerBands@tv-basicstudies"  // Bollinger Bands
-]
+            "autosize": true,
+  "symbol": "NASDAQ:AAPL",
+  "interval": "D",
+  "timezone": "Etc/UTC",
+  "theme": "light",
+  "style": "2",
+  "locale": "in",
+  "allow_symbol_change": true,
+  "calendar": false,
+  "support_host": "https://www.tradingview.com"
         });
     }
 
