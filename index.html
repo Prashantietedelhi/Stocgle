@@ -225,50 +225,72 @@
     }
     
     /* Filter section */
+.filter-section {
+    background-color: #f9f9f9;
+    padding: 30px; /* Increase padding for a larger filter box */
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 400px; /* Increase the width of the filter section */
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+    max-height: 80vh;
+    overflow-y: auto; /* Scroll if content overflows */
+}
+
+/* Adjust filter group for larger inputs and spacing */
+.filter-group {
+    margin-bottom: 20px; /* Increase space between filters */
+}
+
+/* Increase size of labels and inputs */
+.filter-group label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+    font-size: 18px; /* Increase font size for labels */
+}
+
+.filter-group select, .filter-group input {
+    width: 100%;
+    padding: 10px; /* Increase padding for larger input boxes */
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px; /* Increase font size for inputs */
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
     .filter-section {
-        background-color: #f9f9f9;
+        width: 350px; /* Adjust width for smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .filter-section {
+        width: 100%; /* Full width on mobile */
         padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        width: 350px; /* Default width for desktop */
-        z-index: 1000; /* Ensures filter section stays above the table */
-        position: sticky;
-        top: 0;
-        max-height: 80vh; /* Limit the height to make it scrollable */
-        overflow-y: auto; /* Scroll if content overflows */
+        position: relative;
+        max-height: none;
+        overflow-y: visible;
     }
-    
-    /* Adjust filter section for tablets */
-    @media (max-width: 1024px) {
-        .filter-section {
-            width: 300px; /* Smaller width for tablets */
-            position: relative; /* No sticky position on tablet and mobile */
-            max-height: none; /* Remove height limitation */
-            overflow-y: visible; /* No overflow handling */
-        }
+
+    .filter-group input, .filter-group select {
+        font-size: 14px; /* Slightly smaller input size for mobile */
     }
-    
-    /* Adjust filter section for mobile devices */
-    @media (max-width: 768px) {
-        .filter-section {
-            width: 100%; /* Full width on mobile */
-            padding: 15px;
-            position: relative; /* Disable sticky positioning on mobile */
-            max-height: none;
-            overflow-y: visible;
-        }
+}
+
+@media (max-width: 480px) {
+    .filter-section {
+        width: 100%;
+        padding: 10px;
+        position: relative;
+        max-height: none;
+        overflow-y: visible;
     }
-    
-    /* Adjustments for very small mobile devices */
-    @media (max-width: 480px) {
-        .filter-section {
-            width: 100%; /* Full width for small mobile */
-            padding: 10px;
-            position: relative; /* Disable sticky positioning */
-            max-height: none;
-            overflow-y: visible;
-        }
-    }
+}
+
     
     
     /* Add space between each filter and input field */
