@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Filters with DataTable</title>
+    <title>Responsive Filters with DataTable and TradingView</title>
     <!-- Include jQuery, DataTables, and jQuery UI -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.7.1/css/buttons.dataTables.min.css">
@@ -15,8 +15,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.7.1/js/buttons.html5.min.js"></script>
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-    <style>
+    <script src="https://s3.tradingview.com/tv.js"></script> <!-- TradingView Library -->
+    
+    
+    
+<style>
     
 
     h1 {
@@ -427,6 +430,11 @@ tbody tr:hover {
 }
 
 
+        .chart-section {
+            width: 100%;
+            max-width: 700px;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
@@ -434,18 +442,17 @@ tbody tr:hover {
 <h1>Stocgle Analytics Dashboard</h1>
 
 <!-- Main container for filters and table -->
-
 <div class="main-container">
     <div class="filter-section">
         <h3>Filters</h3>
         <div id="filter-container"></div>
-       
+
         <button id="add-filter" class="uniform-button">Add Filter</button>
         <button id="apply-filter" class="uniform-button">Apply Filters</button>
         <button id="reset-filters" class="uniform-button reset-button">Reset Filters</button>
         <button id="reset-columns" class="uniform-button reset-button">Reset All Columns</button>
-
     </div>
+
     <div class="table-section">
         <table id="stock-table" class="display responsive nowrap">
             <thead>
@@ -35772,6 +35779,11 @@ tbody tr:hover {
     </div>
 </div>
 
+<!-- Chart Container for TradingView -->
+<div class="chart-section">
+    <div id="tradingview_chart" style="width: 100%; height: 400px;"></div>
+</div>
+
 <script>
 $(document).ready(function() {
     // Initialize DataTable
@@ -35785,101 +35797,132 @@ $(document).ready(function() {
                 text: 'Download CSV',
                 title: 'Stock Report'
             }
-        ]
+        ],
+         order: [[ 16, 'desc' ]] 
     });
 
+    // Function to dynamically load the TradingView chart
+
+
+
+ function loadTradingViewChart(symbol) {
+        new TradingView.widget({
+            "width": "100%",
+            "height": 500,
+            "symbol": formattedSymbol,
+            "interval": "D",  // Daily chart
+            "timezone": "Etc/UTC",
+            "theme": "light",  // Light theme
+            "style": "1",  // '1' for Line chart (Simple line chart)
+            "toolbar_bg": "#f1f3f6",
+            "withdateranges": true,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart",
+           "studies": [
+    "Volume@tv-basicstudies",  // Volume
+    "RSI@tv-basicstudies",     // RSI
+    "BollingerBands@tv-basicstudies"  // Bollinger Bands
+]
+        });
+    }
+
+
+
+    // Event listener for clicking on the "Company" column (assuming it's the first column)
+$('#stock-table tbody').on('click', 'td:first-child', function () {
+    var symbol = $(this).text().trim();  // Get the company symbol
+    var formattedSymbol = symbol.toUpperCase();  // Format symbol if necessary
+    window.open('tradingview.html?symbol=' + encodeURIComponent(formattedSymbol), '_blank');  // Open in new tab
+});
+
+
+    // Code for filters and reset buttons (original functionality)
     var filterIndex = 0;
 
-    // Function to add new filter
     $('#add-filter').on('click', function() {
         filterIndex++;
         var filterHTML = `
-    <div class="filter-group" id="filter-group-${filterIndex}">
-        <span class="delete-filter" id="delete-filter-${filterIndex}">&times;</span>
-        <div class="filter-controls">
-            <label for="column-select-${filterIndex}">Select Column:</label>
-            <select id="column-select-${filterIndex}">
-                
-                    <option value="0">Company</option>
-                
-                    <option value="1">Financial Result Date</option>
-                
-                    <option value="2">Total Market Cap</option>
-                
-                    <option value="3">Net Profit Cr.</option>
-                
-                    <option value="4">Net Profit Change Quarter %</option>
-                
-                    <option value="5">Net Profit Change Year %</option>
-                
-                    <option value="6">Shareholding Promoters %</option>
-                
-                    <option value="7">Shareholding FII %</option>
-                
-                    <option value="8">Shareholding DII%</option>
-                
-                    <option value="9">Current Stock Price</option>
-                
-                    <option value="10">Traded Volume (Lakhs)</option>
-                
-                    <option value="11">pe</option>
-                
-                    <option value="12">divident</option>
-                
-                    <option value="13">roce</option>
-                
-                    <option value="14">roe</option>
-                
-                    <option value="15">Todays Profit %</option>
-                
-                    <option value="16">Current Profit from Period Start Date %</option>
-                
-                    <option value="17">Probability</option>
-                
-                    <option value="18">Profit on Financial Result Day</option>
-                
-                    <option value="19">Momentum /Valatility</option>
-                
-                    <option value="20">Volume</option>
-                
-                    <option value="21">Sudden Volume Change Date</option>
-                
-                    <option value="22">vol_pct_change</option>
-                
-                    <option value="23">z_score</option>
-                
-                    <option value="24">Profit Day Rs</option>
-                
-            </select>
+        <div class="filter-group" id="filter-group-${filterIndex}">
+            <span class="delete-filter" id="delete-filter-${filterIndex}">&times;</span>
+            <div class="filter-controls">
+                <label for="column-select-${filterIndex}">Select Column:</label>
+                <select id="column-select-${filterIndex}">
+                    
+                        <option value="0">Company</option>
+                    
+                        <option value="1">Financial Result Date</option>
+                    
+                        <option value="2">Total Market Cap</option>
+                    
+                        <option value="3">Net Profit Cr.</option>
+                    
+                        <option value="4">Net Profit Change Quarter %</option>
+                    
+                        <option value="5">Net Profit Change Year %</option>
+                    
+                        <option value="6">Shareholding Promoters %</option>
+                    
+                        <option value="7">Shareholding FII %</option>
+                    
+                        <option value="8">Shareholding DII%</option>
+                    
+                        <option value="9">Current Stock Price</option>
+                    
+                        <option value="10">Traded Volume (Lakhs)</option>
+                    
+                        <option value="11">pe</option>
+                    
+                        <option value="12">divident</option>
+                    
+                        <option value="13">roce</option>
+                    
+                        <option value="14">roe</option>
+                    
+                        <option value="15">Todays Profit %</option>
+                    
+                        <option value="16">Current Profit from Period Start Date %</option>
+                    
+                        <option value="17">Probability</option>
+                    
+                        <option value="18">Profit on Financial Result Day</option>
+                    
+                        <option value="19">Momentum /Valatility</option>
+                    
+                        <option value="20">Volume</option>
+                    
+                        <option value="21">Sudden Volume Change Date</option>
+                    
+                        <option value="22">vol_pct_change</option>
+                    
+                        <option value="23">z_score</option>
+                    
+                        <option value="24">Profit Day Rs</option>
+                    
+                </select>
 
-            <label for="filter-type-${filterIndex}">Filter Type:</label>
-            <select id="filter-type-${filterIndex}">
-                <option value="equals">Equals</option>
-                <option value="greater-than">Greater Than</option>
-                <option value="less-than">Less Than</option>
-                <option value="range">Range</option>
-                <option value="contains">Contains</option>
-                <option value="date-range">Date Range</option>
-            </select>
+                <label for="filter-type-${filterIndex}">Filter Type:</label>
+                <select id="filter-type-${filterIndex}">
+                    <option value="equals">Equals</option>
+                    <option value="greater-than">Greater Than</option>
+                    <option value="less-than">Less Than</option>
+                    <option value="range">Range</option>
+                    <option value="contains">Contains</option>
+                    <option value="date-range">Date Range</option>
+                </select>
 
-            <div id="filter-inputs-${filterIndex}"></div>
-        </div>
-    </div>
-`;
-
-
+                <div id="filter-inputs-${filterIndex}"></div>
+            </div>
+        </div>`;
 
         $('#filter-container').append(filterHTML);
         updateFilterInputs(filterIndex);
     });
 
-    // Event delegation for delete-filter button to handle dynamically added elements
     $('#filter-container').on('click', '.delete-filter', function() {
         var filterId = $(this).attr('id').split('-')[2];
         $('#filter-group-' + filterId).remove();
     });
 
-    // Function to update input fields for each filter
     function updateFilterInputs(index) {
         $(`#filter-type-${index}`).on('change', function() {
             var filterType = $(this).val();
@@ -35905,10 +35948,8 @@ $(document).ready(function() {
         $(`#filter-type-${index}`).trigger('change');
     }
 
-    // Apply Filters
     $('#apply-filter').on('click', function() {
         $.fn.dataTable.ext.search = [];
-
         $('.filter-group').each(function() {
             var index = $(this).attr('id').split('-')[2];
             var columnIndex = $(`#column-select-${index}`).val();
@@ -35935,7 +35976,6 @@ $(document).ready(function() {
             } else if (filterType === 'range') {
                 var minValue = parseFloat($(`#min-value-${index}`).val());
                 var maxValue = parseFloat($(`#max-value-${index}`).val());
-
                 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                     var value = parseFloat(data[columnIndex]) || 0;
                     return (isNaN(minValue) && isNaN(maxValue)) ||
@@ -35946,7 +35986,6 @@ $(document).ready(function() {
             } else if (filterType === 'date-range') {
                 var startDate = $(`#start-date-${index}`).val();
                 var endDate = $(`#end-date-${index}`).val();
-
                 $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
                     var date = data[columnIndex];
                     return (startDate === '' && endDate === '') ||
@@ -35956,48 +35995,31 @@ $(document).ready(function() {
                 });
             }
         });
-
         table.draw();
     });
 
-    // Reset Filters
     $('#reset-filters').on('click', function() {
         $('#filter-container').empty();
         filterIndex = 0;
-
         table.search('').columns().search('').draw();
         $.fn.dataTable.ext.search = [];
     });
 
-    // Delete column when cross (×) icon is clicked
-    $('.delete-column-btn').on('click', function() {
-        var columnIdx = $(this).data('column');
-        table.column(columnIdx).visible(false);
-    });
-
-   // Reset all columns when "Reset All Columns" button is clicked
-$('#reset-columns').on('click', function() {
-    // Check if any columns are hidden and only perform reset if needed
-    var columnsChanged = false;
-    
-    table.columns().every(function(index) {
-        if (!this.visible()) {
-            this.visible(true); // Reset each column to visible if it's currently hidden
-            columnsChanged = true; // Mark that a column visibility was changed
+    $('#reset-columns').on('click', function() {
+        var columnsChanged = false;
+        table.columns().every(function(index) {
+            if (!this.visible()) {
+                this.visible(true);
+                columnsChanged = true;
+            }
+        });
+        if (columnsChanged) {
+            table.columns.adjust().draw(false);
         }
     });
 
-    // Redraw the table only if columns were changed
-    if (columnsChanged) {
-        table.columns.adjust().draw(false);
-    }
-});
-
-
-    // Initialize first filter
     $('#add-filter').trigger('click');
 });
-
 </script>
 </body>
 </html>
