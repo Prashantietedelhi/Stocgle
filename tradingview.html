@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Chart - TradingView</title>
+    <script src="https://s3.tradingview.com/tv.js"></script> <!-- TradingView Library -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        #tradingview_chart {
+            width: 100%;
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Stock Chart</h1>
+    <div id="tradingview_chart"></div>
+
+    <script>
+    // Function to get URL parameters
+    function getQueryParam(param) {
+        let urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Get the stock symbol from the URL
+    var symbol = getQueryParam('symbol');
+    if (symbol) {
+        // Load the TradingView chart with the symbol from the URL
+        new TradingView.widget({
+            "width": "100%",
+            "height": 600,
+            "symbol": "NSE:" + symbol,  // Assuming NSE, adjust if needed
+            "interval": "D",  // Daily chart
+            "timezone": "Asia/Kolkata",
+            "theme": "light",
+            "style": "1",
+            "locale": "in",
+            "toolbar_bg": "#f1f3f6",
+            "enable_publishing": false,
+            "allow_symbol_change": true,
+            "container_id": "tradingview_chart"
+        });
+    } else {
+        alert("No symbol provided");
+    }
+    </script>
+
+</body>
+</html>
