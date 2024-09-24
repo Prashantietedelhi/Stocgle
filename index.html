@@ -35843,16 +35843,23 @@ $(document).ready(function() {
 
 
 
- function openTradingViewChart(symbol) {
+  function openTradingViewChart(symbol) {
         var tradingViewURL = `https://www.tradingview.com/chart/?symbol=NSE%3A${encodeURIComponent(symbol)}`;
-        // Open in a new window with specific size and position, adjusting to screen size
-        var width = screen.width * 0.8;
-        var height = screen.height * 0.8;
-        var left = (screen.width - width) / 2;
-        var top = (screen.height - height) / 2;
 
-        window.open(tradingViewURL, '_blank', `toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=${width},height=${height},top=${top},left=${left}`);
+        // Get screen width and height to adjust for mobile or desktop
+        var screenWidth = window.innerWidth || document.documentElement.clientWidth || screen.width;
+        var screenHeight = window.innerHeight || document.documentElement.clientHeight || screen.height;
+
+        // Set the window size to a responsive width and height
+        var popupWidth = screenWidth * 0.9; // 90% of screen width
+        var popupHeight = screenHeight * 0.9; // 90% of screen height
+        var left = (screenWidth - popupWidth) / 2; // Center the popup
+        var top = (screenHeight - popupHeight) / 2;
+
+        // Open the pop-up window with specific size and location
+        window.open(tradingViewURL, '_blank', `width=${popupWidth},height=${popupHeight},top=${top},left=${left},scrollbars=yes,resizable=yes`);
     }
+
     // Event listener for clicking on the "Company" column (assuming it's the first column)
     $('#stock-table tbody').on('click', 'td:first-child', function () {
         var symbol = $(this).text().trim();  // Get the company symbol
