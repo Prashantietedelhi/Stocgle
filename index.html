@@ -17,36 +17,27 @@
     <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
     <style>
+    
+
+    h1 {
+        text-align: center;
+        font-size: 24px;
+        margin-top: 20px; /* Adjust margin as needed */
+        width: 100%;
+        background-color: #fff;
+        padding: 10px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
          .main-container {
         display: flex;
         flex-direction: row; /* Horizontal layout by default */
         gap: 20px;
         align-items: flex-start;
     }
-        /* Filter section */
-    .filter-section {
-        background-color: #f9f9f9;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
-        width: 250px; /* Fixed width for filters */
-        z-index: 1000; /* Ensures filter section stays above the table */
-        position: sticky;
-        top: 0;
-    }
+  
 
-        /* Add space between each filter */
-        .filter-group {
-            margin-bottom: 20px;
-            position: relative; /* Allow positioning of filter dropdowns */
-        }
-
-        /* Style the dropdown to prevent it from being hidden */
-        .filter-group select {
-            z-index: 1001; /* Ensure dropdown stays above table */
-            position: relative;
-        }
-
+       
          /* Table container */
     .table-section {
         overflow-x: auto;
@@ -167,6 +158,262 @@
             width: 100%; /* Full width for the table */
         }
     }
+    /* Default button style */
+.uniform-button {
+    width: 100%; /* Takes full width available */
+    max-width: 250px; /* Default max width for buttons on larger screens */
+    padding: 10px;
+    background-color: white; /* Set background color to white */
+    color: #333; /* Dark text color */
+    border-radius: 5px;
+    margin: 10px 0;
+    border: 1px solid #ccc; /* Add a subtle border */
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Hover effect for all buttons */
+.uniform-button:hover {
+    background-color: #f1f1f1; /* Light grey background on hover */
+    border-color: #999; /* Darker border on hover */
+}
+
+/* Reset button style */
+.reset-button {
+    background-color: white; /* Same white background */
+    color: #dc3545; /* Red text color for reset */
+    border: 1px solid #dc3545; /* Red border */
+}
+
+.reset-button:hover {
+    background-color: #f8d7da; /* Slightly pink background on hover */
+    color: #c82333; /* Darker red text on hover */
+    border-color: #c82333; /* Darker red border on hover */
+}
+
+/* Media query for tablets */
+@media (max-width: 1024px) {
+    .uniform-button {
+        max-width: 200px; /* Smaller max width for tablets */
+    }
+}
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+    .uniform-button {
+        max-width: 150px; /* Even smaller max width for mobile screens */
+    }
+}
+
+/* Media query for very small mobile devices */
+@media (max-width: 480px) {
+    .uniform-button {
+        max-width: 100%; /* Full width on small mobile screens */
+    }
+}
+
+
+/* Main container for filters and table */
+.main-container {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: flex-start;
+}
+
+.filter-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    width: 350px; /* Default width for desktop */
+    z-index: 1000; /* Ensures filter section stays above the table */
+    position: sticky;
+    top: 0;
+}
+
+/* Adjust filter section width for tablets */
+@media (max-width: 1024px) {
+    .filter-section {
+        width: 300px; /* Slightly smaller for tablets */
+    }
+}
+
+/* Adjust filter section width for mobile devices */
+@media (max-width: 768px) {
+    .filter-section {
+        width: 100%; /* Full width for mobile screens */
+        padding: 15px; /* Slightly reduced padding for mobile */
+    }
+}
+
+/* Adjustments for very small mobile devices */
+@media (max-width: 480px) {
+    .filter-section {
+        width: 100%; /* Full width for small mobile devices */
+        padding: 10px; /* Further reduce padding */
+    }
+}
+
+/* Add space between each filter and input field */
+.filter-group {
+    margin-bottom: 15px;
+}
+
+/* Label and input alignment */
+.filter-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.filter-group select, .filter-group input {
+    width: 100%;
+    padding: 3px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+/* Table section */
+.table-section {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #fff;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    flex-grow: 1;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+}
+
+th, td {
+    padding: 15px;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #333;
+    border-bottom: 2px solid #ddd;
+    position: relative;
+}
+
+/* Row hover effect */
+tbody tr:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
+}
+
+/* Uniform button styling */
+.uniform-button {
+    width: 100%;
+    max-width: 250px;
+    padding: 10px;
+    background-color: white;
+    color: #333;
+    border-radius: 5px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.uniform-button:hover {
+    background-color: #f1f1f1;
+    border-color: #999;
+}
+
+/* Reset button styling */
+.reset-button {
+    background-color: white;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+}
+
+.reset-button:hover {
+    background-color: #f8d7da;
+    color: #c82333;
+    border-color: #c82333;
+}
+
+/* Responsive adjustments for smaller screens */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .filter-section {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .table-section {
+        width: 100%;
+    }
+}
+
+/* Media query for button size adjustments */
+@media (max-width: 1024px) {
+    .uniform-button {
+        max-width: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    .uniform-button {
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .uniform-button {
+        max-width: 100%;
+    }
+}
+
+
+/* Cross (X) icon for filter delete, now positioned to the left */
+.delete-filter {
+    font-size: 14px;
+    color: red;
+    cursor: pointer;
+    margin-right: 10px; /* Space between the cross button and the label */
+    display: inline-block;
+    vertical-align: middle; /* Align it vertically with the text */
+}
+
+.delete-filter:hover {
+    color: darkred;
+    cursor: pointer;
+}
+
+/* Filter group layout */
+.filter-group {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 10px;
+}
+
+/* Make the column select, filter type, and input boxes block elements */
+.filter-section select,
+.filter-section label,
+.filter-section div {
+    display: block;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+
     </style>
 </head>
 <body>
@@ -174,14 +421,17 @@
 <h1>Stocgle Analytics Dashboard</h1>
 
 <!-- Main container for filters and table -->
+
 <div class="main-container">
     <div class="filter-section">
         <h3>Filters</h3>
         <div id="filter-container"></div>
-        <button id="add-filter" class="dt-button">Add Filter</button>
-        <button id="apply-filter" class="dt-button">Apply Filters</button>
-        <button id="reset-filters" class="dt-button reset-button">Reset Filters</button>
-        <button id="reset-columns" class="dt-button reset-button">Reset All Columns</button>
+       
+        <button id="add-filter" class="uniform-button">Add Filter</button>
+        <button id="apply-filter" class="uniform-button">Apply Filters</button>
+        <button id="reset-filters" class="uniform-button reset-button">Reset Filters</button>
+        <button id="reset-columns" class="uniform-button reset-button">Reset All Columns</button>
+
     </div>
     <div class="table-section">
         <table id="stock-table" class="display responsive nowrap">
@@ -35531,8 +35781,9 @@ $(document).ready(function() {
     $('#add-filter').on('click', function() {
         filterIndex++;
         var filterHTML = `
-        <div class="filter-group" id="filter-group-${filterIndex}">
-            <span class="delete-filter" id="delete-filter-${filterIndex}">&times;</span>
+    <div class="filter-group" id="filter-group-${filterIndex}">
+        <span class="delete-filter" id="delete-filter-${filterIndex}">&times;</span>
+        <div class="filter-controls">
             <label for="column-select-${filterIndex}">Select Column:</label>
             <select id="column-select-${filterIndex}">
                 
@@ -35600,15 +35851,19 @@ $(document).ready(function() {
 
             <div id="filter-inputs-${filterIndex}"></div>
         </div>
-        `;
+    </div>
+`;
+
+
 
         $('#filter-container').append(filterHTML);
         updateFilterInputs(filterIndex);
+    });
 
-        // Add event listener for delete filter button
-        $(`#delete-filter-${filterIndex}`).on('click', function() {
-            $(`#filter-group-${filterIndex}`).remove();
-        });
+    // Event delegation for delete-filter button to handle dynamically added elements
+    $('#filter-container').on('click', '.delete-filter', function() {
+        var filterId = $(this).attr('id').split('-')[2];
+        $('#filter-group-' + filterId).remove();
     });
 
     // Function to update input fields for each filter
@@ -35707,16 +35962,29 @@ $(document).ready(function() {
         table.column(columnIdx).visible(false);
     });
 
-    // Reset all columns when "Reset All Columns" button is clicked
-    $('#reset-columns').on('click', function() {
-        table.columns().every(function(index) {
-            this.visible(true); // Make all columns visible again
-        });
+   // Reset all columns when "Reset All Columns" button is clicked
+$('#reset-columns').on('click', function() {
+    // Check if any columns are hidden and only perform reset if needed
+    var columnsChanged = false;
+    
+    table.columns().every(function(index) {
+        if (!this.visible()) {
+            this.visible(true); // Reset each column to visible if it's currently hidden
+            columnsChanged = true; // Mark that a column visibility was changed
+        }
     });
+
+    // Redraw the table only if columns were changed
+    if (columnsChanged) {
+        table.columns.adjust().draw(false);
+    }
+});
+
 
     // Initialize first filter
     $('#add-filter').trigger('click');
 });
+
 </script>
 </body>
 </html>
